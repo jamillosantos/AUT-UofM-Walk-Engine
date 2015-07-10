@@ -19,7 +19,7 @@ void vWalk_Engine_Task( void *pvParameters ){
   
   //stand for first time
   //Stand_Init(1.0, 500);
-  Stand_Init_T(0.1,500);
+  Stand_Init_T(0.05,300);
   //vTaskDelay(2000); 
   //get robot state
   Robot_State();
@@ -167,7 +167,8 @@ void Omni_Gait(double vx, double vy, double vt){
     if ( ((t>=(Pi/2.0)-WEP[P_Motion_Resolution])&&(t<=(Pi/2.0)+WEP[P_Motion_Resolution])) || ((t>=((3.0*Pi)/2.0)-WEP[P_Motion_Resolution])&&(t<=((3.0*Pi)/2.0)+WEP[P_Motion_Resolution])) ){ 
         vTaskDelay(WEP[P_Single_Support_Sleep]);
     }
-  
+    
+    noInterrupts(); 
     //right leg initialize
     //if t<pi the right leg in fly state and other wise in support state
     R_Leg_Ik[I_X]     = (-(cos(t)*(vx*100.0)))+ (vx * WEP[P_Body_X_Swing_Gain] * 100.0); 
@@ -186,7 +187,8 @@ void Omni_Gait(double vx, double vy, double vt){
     L_Leg_Ik[I_Roll]  = (t>=Pi) ? (sin(t)*(WEP[P_Fly_Roll_Gain])) : (sin(t)*(WEP[P_Support_Roll_Gain])); 
     L_Leg_Ik[I_Pitch] = (t>=Pi) ? 0.0 : (sin(t-Pi)*WEP[P_Support_Pitch_Gain]);
     L_Leg_Ik[I_Yaw]   = (cos(t-Pi)*(vt)); //(cos(t-Pi)*(vt));
-  
+    interrupts();
+    
     //right arm initialize
     R_Arm[I_A_Pitch]   = ((cos(t)) * vx * 1.3); // + Arm_Hopping_Val; // + ((MPU_X+Get_E_Param(Addr_IMU_X_Angle_Offset)) * Get_E_Param(Addr_Stablizer_Arm_Pitch_Gain)*2);
     R_Arm[I_A_Roll]    = 0.0;

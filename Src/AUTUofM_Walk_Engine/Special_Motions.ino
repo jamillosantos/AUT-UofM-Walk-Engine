@@ -21,94 +21,106 @@ void Motion_Stand_Up_Back(byte Robot_Num){
 }
 
 void Run_R_Kik_Motion(byte Robot_Num){
-
+  //akbar
   if (Robot_Num==0){
+    double Go_To_Leg=65;
+    double S_Leg_Roll=0.35;
     
-    WEP[P_COM_Z_offset]=130;
+    int    Motion_Time        =10.0;
+    double Motion_Resolution  =0.03; 
+    double Motion_Speed       =0.6;
     
-    Update_Ik(0.002, 0.002, R_Leg_Ik, L_Leg_Ik, R_Arm, L_Arm);
+    double Fly_Leg_X_Gain=120;
+    double Fly_Leg_Z_Gain=120;
+    double Fly_Leg_Roll_Gain=0.0;
+    double Fly_Leg_Pith_Gain=0.3;
+    double Support_Leg_Pith_Gain=-0.09; 
+    double Hands_Gain         =0.8;
     
-    vTaskDelay(1000);
-
-    for(int i=0;i<=50;i++){
-   delay(10);
     //right leg initialize
-    L_Leg_Ik[I_X]     =0; 
-    L_Leg_Ik[I_Y]     =-70;
+    R_Leg_Ik[I_X]     = 0.0;
+    R_Leg_Ik[I_Y]     = Go_To_Leg;
+    R_Leg_Ik[I_Z]     = 0.0;
+    R_Leg_Ik[I_Roll]  = 0.0;
+    R_Leg_Ik[I_Pitch] = 0.0;
+    R_Leg_Ik[I_Yaw]   = 0.0;
+  
+      //left leh initialize
+    L_Leg_Ik[I_X]     =0.0; 
+    L_Leg_Ik[I_Y]     =-Go_To_Leg;
     L_Leg_Ik[I_Z]     =0.0;
-    L_Leg_Ik[I_Roll]  =0;
-    L_Leg_Ik[I_Pitch] =0.00;
+    L_Leg_Ik[I_Roll]  =S_Leg_Roll;
+    L_Leg_Ik[I_Pitch] =0.0;
     L_Leg_Ik[I_Yaw]   =0.0;
-    //left leh initialize
-    R_Leg_Ik[I_X]     =0; 
-    R_Leg_Ik[I_Y]     =70;
-    R_Leg_Ik[I_Z]     =0;
-    R_Leg_Ik[I_Roll]  =0;
-    R_Leg_Ik[I_Pitch] =0.00;
-    R_Leg_Ik[I_Yaw]   =0.0; 
+  
     //right arm initialize
-    L_Arm[I_A_Pitch]   =0.0;
-    L_Arm[I_A_Roll]    =0.0;
-    L_Arm[I_A_Elbow]   =0.0;
-    L_Arm[I_A_Vp]      =0.1;
-    L_Arm[I_A_Vr]      =0.1;
-    L_Arm[I_A_Ve]      =0.1;
+    R_Arm[I_A_Pitch]   = 0.0;
+    R_Arm[I_A_Roll]    = 0.0;
+    R_Arm[I_A_Elbow]   = 0.0;
+    R_Arm[I_A_Vp]      = 0.1;
+    R_Arm[I_A_Vr]      = 0.1;
+    R_Arm[I_A_Ve]      = 0.1;
+  
     //left arm initialize
-    R_Arm[I_A_Pitch]   =0.0;
-    R_Arm[I_A_Roll]    =0.3;
-    R_Arm[I_A_Elbow]   =0.0;
-    R_Arm[I_A_Vp]      =0.1;
-    R_Arm[I_A_Vr]      =0.1;
-    R_Arm[I_A_Ve]      =0.1; 
-    //update robotis joints
-    Update_Ik(0.03, 0.03, R_Leg_Ik, L_Leg_Ik, R_Arm, L_Arm);
-    }
-    vTaskDelay(400);
-  // Ten Size Akbar=0  Asghar=1
-
-    for(double t=0; t<=Pi ;t+=0.025){       
+    L_Arm[I_A_Pitch]   = 0.0;
+    L_Arm[I_A_Roll]    = 0.0;
+    L_Arm[I_A_Elbow]   = 0.0;
+    L_Arm[I_A_Vp]      = 0.1;
+    L_Arm[I_A_Vr]      = 0.1;
+    L_Arm[I_A_Ve]      = 0.1;
+  
+      //update robotis joints
+    Update_Ik(0.1, 0.1 , R_Leg_Ik, L_Leg_Ik, R_Arm, L_Arm); 
+    vTaskDelay(100);
+        
+    for(double t=0; t<=Pi ;t+=Motion_Resolution){  
+      
       //right leg initialize
-
-
-      R_Leg_Ik[I_X]     =(sin(2.3 * (t-1.5)) *(1.4 * 100.0));
-      if ((t>=1.2) && (t<=1.7)) R_Leg_Ik[I_X]=140; 
-      R_Leg_Ik[I_Y]     =(sin(t)*(0.8 * 100.0));
-      R_Leg_Ik[I_Z]     =(t>=0.5) ? (sin((t*0.8)-0.01)  *(1.2 * 100.0)) : -15 ;
-      R_Leg_Ik[I_Roll]  =(sin(t)*(-0.1));
-      R_Leg_Ik[I_Pitch] =0.0;
-      R_Leg_Ik[I_Yaw]   =0.0;
+      R_Leg_Ik[I_X]     = -Fly_Leg_X_Gain * (t * sin(t)) * sin(2.0 * t);
+      R_Leg_Ik[I_Y]     = Go_To_Leg;
+      R_Leg_Ik[I_Z]     = (Fly_Leg_Z_Gain*10.0)    * sin(t); if(R_Leg_Ik[I_Z]>=((Fly_Leg_Z_Gain*10.0)/20.0))        R_Leg_Ik[I_Z]=(Fly_Leg_Z_Gain*10.0)/20.0;
+      R_Leg_Ik[I_Roll]  = Fly_Leg_Roll_Gain * sin(t); if(R_Leg_Ik[I_Roll]>=(Fly_Leg_Roll_Gain/10.0))  R_Leg_Ik[I_Roll]=Fly_Leg_Roll_Gain/10.0;
+      R_Leg_Ik[I_Pitch] = Fly_Leg_Pith_Gain * sin(t); if(R_Leg_Ik[I_Pitch]>=(Fly_Leg_Pith_Gain/2.0)) R_Leg_Ik[I_Pitch]=Fly_Leg_Pith_Gain/2.0;
+      R_Leg_Ik[I_Yaw]   = 0.0;
   
       //left leh initialize
       L_Leg_Ik[I_X]     =0.0; 
-      L_Leg_Ik[I_Y]     =(sin(0.8*t)*(-0.95 * 100.0));
+      L_Leg_Ik[I_Y]     =-Go_To_Leg;
       L_Leg_Ik[I_Z]     =0.0;
-      L_Leg_Ik[I_Roll]  =(sin(0.8*t)*(0.34));
-      L_Leg_Ik[I_Pitch] =(sin(0.8*t)*(-0.15));
+      L_Leg_Ik[I_Roll]  =S_Leg_Roll;
+      L_Leg_Ik[I_Pitch] =Support_Leg_Pith_Gain * sin(t); if(L_Leg_Ik[I_Pitch]>=(Support_Leg_Pith_Gain/10.0)) L_Leg_Ik[I_Pitch] = Support_Leg_Pith_Gain/10.0;
       L_Leg_Ik[I_Yaw]   =0.0;
   
       //right arm initialize
-      R_Arm[I_A_Pitch]   = 0.0; //(cos(t)); // + Arm_Hopping_Val; // + ((MPU_X+Get_E_Param(Addr_IMU_X_Angle_Offset)) * Get_E_Param(Addr_Stablizer_Arm_Pitch_Gain)*2);
-      R_Arm[I_A_Roll]    = 0.3;
+      R_Arm[I_A_Pitch]   = Hands_Gain  * (sin(2 * t)); 
+      R_Arm[I_A_Roll]    = 0.0;
       R_Arm[I_A_Elbow]   = 0.0;
-      R_Arm[I_A_Vp]      = 0.2;
-      R_Arm[I_A_Vr]      = 0.05;
-      R_Arm[I_A_Ve]      = 0.05;
+      R_Arm[I_A_Vp]      = Motion_Speed;
+      R_Arm[I_A_Vr]      = Motion_Speed;
+      R_Arm[I_A_Ve]      = Motion_Speed;
   
       //left arm initialize
-      L_Arm[I_A_Pitch]   = 0.0; // ((cos(t-Pi)) * vx * 1.3); // + Arm_Hopping_Val;// + ((MPU_X+Get_E_Param(Addr_IMU_X_Angle_Offset)) * Get_E_Param(Addr_Stablizer_Arm_Pitch_Gain)*2); 
+      L_Arm[I_A_Pitch]   = Hands_Gain * (-sin(2 * t)); 
       L_Arm[I_A_Roll]    = 0.0;
       L_Arm[I_A_Elbow]   = 0.0;
-      L_Arm[I_A_Vp]      = 0.2;
-      L_Arm[I_A_Vr]      = 0.05;
-      L_Arm[I_A_Ve]      = 0.05;
+      L_Arm[I_A_Vp]      = Motion_Speed;
+      L_Arm[I_A_Vr]      = Motion_Speed;
+      L_Arm[I_A_Ve]      = Motion_Speed;
   
       //update robotis joints
-      Update_Ik(0.8, 0.8, R_Leg_Ik, L_Leg_Ik, R_Arm, L_Arm); 
-      vTaskDelay(6);
+      Update_Ik(Motion_Speed, Motion_Speed , R_Leg_Ik, L_Leg_Ik, R_Arm, L_Arm); 
+      vTaskDelay(Motion_Time);
     }//main gait timi for ins 
-    WEP[P_COM_Z_offset]=80;
-    Update_Ik(0.002, 0.002, R_Leg_Ik, L_Leg_Ik, R_Arm, L_Arm);
+    Stand_Init_T(1.0, 10);
   }
+  
+  
+  
+  
+  
+  
+  
+  //asghar
   else if(Robot_Num==1){
 
     for(double t=0; t<=Pi ;t+=0.025){       

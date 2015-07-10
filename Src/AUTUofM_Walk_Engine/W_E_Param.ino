@@ -12,7 +12,7 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     
   //akbar
   if (Robot_Num==0){
-    WEP[P_Leg_Length]=475.0;
+    WEP[P_Leg_Length]=471.0;
     
     WEP[Vx_Offset]=-0.05;
     WEP[Vy_Offset]=0;

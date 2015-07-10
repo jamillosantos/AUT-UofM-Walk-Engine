@@ -22,7 +22,6 @@ void vRobot_State_Task( void *pvParameters ){
     
     //run motion if key pressed
     if(digitalRead(BUTTON1_485EXP) == 1){
-      vTaskDelay(2500);
       Motion_Ins=Motion_1;   
       Serial2.println("AUT_UofM:> Key Presed!");
     }
