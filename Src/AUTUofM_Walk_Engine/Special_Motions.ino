@@ -26,16 +26,16 @@ void Run_R_Kik_Motion(byte Robot_Num){
     double Go_To_Leg=65;
     double S_Leg_Roll=0.35;
     
-    int    Motion_Time        =10.0;
+    int    Motion_Time        =10;
     double Motion_Resolution  =0.03; 
-    double Motion_Speed       =0.6;
+    double Motion_Speed       =0.65;
     
-    double Fly_Leg_X_Gain=120;
-    double Fly_Leg_Z_Gain=120;
-    double Fly_Leg_Roll_Gain=0.0;
-    double Fly_Leg_Pith_Gain=0.3;
-    double Support_Leg_Pith_Gain=-0.09; 
-    double Hands_Gain         =0.8;
+    double Fly_Leg_X_Gain        =120;
+    double Fly_Leg_Z_Gain        =120;
+    double Fly_Leg_Roll_Gain     =0.0;
+    double Fly_Leg_Pith_Gain     =0.1;
+    double Support_Leg_Pith_Gain =-0.09; 
+    double Hands_Gain            =0.8;
     
     //right leg initialize
     R_Leg_Ik[I_X]     = 0.0;
@@ -71,7 +71,7 @@ void Run_R_Kik_Motion(byte Robot_Num){
   
       //update robotis joints
     Update_Ik(0.1, 0.1 , R_Leg_Ik, L_Leg_Ik, R_Arm, L_Arm); 
-    vTaskDelay(100);
+    vTaskDelay(150);
         
     for(double t=0; t<=Pi ;t+=Motion_Resolution){  
       
