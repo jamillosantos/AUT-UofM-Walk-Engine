@@ -185,7 +185,7 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_Body_Z_Swing_Gain]=0;                  
 
     //stablization parameters
-    WEP[P_Stablizer_Arm_Pitch_Gain]=-2.2;   //-2.5       
+    WEP[P_Stablizer_Arm_Pitch_Gain]=-3.0;   //-2.5       
     WEP[P_Stablizer_Arm_Roll_Gain]=1.2;      //2       
     WEP[P_Stablizer_Arm_Elbow_Gain]=0;           
     WEP[P_Stablizer_Hip_Roll_Gain]=0;   //-1.5        
@@ -196,13 +196,13 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_Stablizer_COM_X_Shift_Gain]=10; //200         
     WEP[P_Stablizer_COM_Y_Shift_Gain]=30;//200        
 
-    WEP[P_Gyro_Stablizer_Arm_Pitch_Gain]=-0.0000001;  //0.001      
+    WEP[P_Gyro_Stablizer_Arm_Pitch_Gain]=-0.00001;  //0.001      
     WEP[P_Gyro_Stablizer_Arm_Roll_Gain]=0;       
     WEP[P_Gyro_Stablizer_Arm_Elbow_Gain]=0;      
     WEP[P_Gyro_Stablizer_Hip_Roll_Gain]=0;      
     WEP[P_Gyro_Stablizer_Hip_Pitch_Gain]=0;     
     WEP[P_Gyro_Stablizer_Knee_Gain]=0;           
-    WEP[P_Gyro_Stablizer_Foot_Pitch_Gain]=-0.000001; //-0.001     
+    WEP[P_Gyro_Stablizer_Foot_Pitch_Gain]=-0.000002; //-0.001     
     WEP[P_Gyro_Stablizer_Foot_Roll_Gain]=0;     
     WEP[P_Gyro_Stablizer_COM_X_Shift_Gain]=0;//0.5     
     WEP[P_Gyro_Stablizer_COM_Y_Shift_Gain]=0;   
@@ -216,7 +216,7 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_COM_Y_offset]=25;                       
     WEP[P_COM_Z_offset]=60;                       
     WEP[P_COM_Roll_offset]=0;                   
-    WEP[P_COM_Pitch_offset]=0.115;                   
+    WEP[P_COM_Pitch_offset]=0.0;                   
     WEP[P_COM_Yaw_offset]=0.0;                   
  
     //legs joints offset 
@@ -262,12 +262,12 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_IMU_Y_Angle_Offset]= -0.05;
     
     //MPU filtering parametrs 
-    WEP[P_Gyro_X_LowPass_Gain]=0.6;              
+    WEP[P_Gyro_X_LowPass_Gain]=0.85;              
     WEP[P_Gyro_Y_LowPass_Gain]=0.7;             
     
     //kalman filter r mesurement value
-    WEP[P_Kalman_Roll_RM_Rate]=80;               
-    WEP[P_Kalman_Pitch_RM_Rate]=40;             
+    WEP[P_Kalman_Roll_RM_Rate]=500;               
+    WEP[P_Kalman_Pitch_RM_Rate]=200;             
     WEP[P_Kalman_Yaw_RM_Rate]=50;                
     
     //smoothing ratio

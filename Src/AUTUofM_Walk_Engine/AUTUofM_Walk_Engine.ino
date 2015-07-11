@@ -8,8 +8,8 @@
 //#include "pplsq.h"
 
 // Ten Size Akbar=0  Asghar=1
-#define Teen_Size_Robot_Num   (0)  //AK
-//#define Teen_Size_Robot_Num   (1) //AS
+//#define Teen_Size_Robot_Num   (0)  //AK
+#define Teen_Size_Robot_Num   (1) //AS
 
 //motion numbers table
 #define Motion_1                     0x01

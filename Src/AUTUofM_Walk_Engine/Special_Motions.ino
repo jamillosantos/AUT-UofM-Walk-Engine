@@ -23,18 +23,19 @@ void Motion_Stand_Up_Back(byte Robot_Num){
 void Run_R_Kik_Motion(byte Robot_Num){
   //akbar
   if (Robot_Num==0){
-    double Go_To_Leg=65;
-    double S_Leg_Roll=0.35;
+    double Go_To_Leg          =65; //*
+    double S_Leg_Roll         =0.35;
+    int    Go_To_Leg_Time     =150;  //**
     
-    int    Motion_Time        =10;
-    double Motion_Resolution  =0.03; 
-    double Motion_Speed       =0.65;
+    int    Motion_Time        =10; //fix
+    double Motion_Resolution  =0.03;  // motion resolution ***
+    double Motion_Speed       =0.65;  //speed of motors ***
     
     double Fly_Leg_X_Gain        =120;
     double Fly_Leg_Z_Gain        =120;
     double Fly_Leg_Roll_Gain     =0.0;
     double Fly_Leg_Pith_Gain     =0.1;
-    double Support_Leg_Pith_Gain =-0.09; 
+    double Support_Leg_Pith_Gain =-0.09;  //front fall and back
     double Hands_Gain            =0.8;
     
     //right leg initialize
@@ -71,7 +72,7 @@ void Run_R_Kik_Motion(byte Robot_Num){
   
       //update robotis joints
     Update_Ik(0.1, 0.1 , R_Leg_Ik, L_Leg_Ik, R_Arm, L_Arm); 
-    vTaskDelay(150);
+    vTaskDelay(Go_To_Leg_Time);
         
     for(double t=0; t<=Pi ;t+=Motion_Resolution){  
       

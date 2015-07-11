@@ -55,7 +55,7 @@ void vWalk_Engine_Task( void *pvParameters ){
       WEL_Loop_Cnt++;
       //firts run gait generation with vx=vy=vt=0 for semi gait generation to stand position
       if (Internal_Motion_Request==No_Motion ){
-        Stand_Init(1.0);
+        Stand_Init(0.5);
       }
       
       if (Internal_Motion_Request==Stop_Motion ){
