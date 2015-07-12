@@ -22,7 +22,7 @@
 #define Id_Head_Tilt                 31
 
 //this is fix for humanoid with 20 DOF
-#define NUM_OF_DXL            (18)  
+#define NUM_OF_DXL                  (18)  
 
 //global array for set joint angle
 double Angle[NUM_OF_DXL];
@@ -39,14 +39,14 @@ int    D_GOAL_POSITION[NUM_OF_DXL]; //this is not global
 int    D_MOVING_SPEED[NUM_OF_DXL];  //this is also!
 
 //address registers for dynamixel
-#define P_TORQUE_ENABLE     24
-#define P_GOAL_POSITION_L   30
-#define P_PRESENT_VOLTAGE   42
-#define P_P_Gain            28
-#define P_I_Gain            27
-#define P_D_Gain            26
-#define P_Baud_Rate         4
-#define P_Return_Delay_Time 5
+#define P_TORQUE_ENABLE       24
+#define P_GOAL_POSITION_L     30
+#define P_PRESENT_VOLTAGE     42
+#define P_P_Gain              28
+#define P_I_Gain              27
+#define P_D_Gain              26
+#define P_Baud_Rate           4
+#define P_Return_Delay_Time   5
 
 //joints direction for robot joints
 int Joints_Direction[NUM_OF_DXL];
@@ -79,6 +79,10 @@ void vDynamixel_Update_Task( void *pvParameters ){
   //main task loop
   for( ;; ){
     DXL_Loop_Cnt++;
+    
+    //if(Debug_Mode){
+    //  RTOS_Error_Log("DXL Task:",DXL_Loop_Cnt);
+    //}
     
     if(DXL_Loop_Cnt==1){
       vTaskSuspendAll();

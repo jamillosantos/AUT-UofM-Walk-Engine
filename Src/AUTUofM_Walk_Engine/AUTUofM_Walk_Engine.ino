@@ -6,10 +6,13 @@
 //#include "EEPROM.h"
 //#include "orpol.h"
 //#include "pplsq.h"
+#include "stdio.h"
 
 // Ten Size Akbar=0  Asghar=1
 //#define Teen_Size_Robot_Num   (0)  //AK
-#define Teen_Size_Robot_Num   (1) //AS
+#define Teen_Size_Robot_Num     (1) //AS
+
+#define Debug_Mode              (0)
 
 //motion numbers table
 #define Motion_1                     0x01
@@ -51,24 +54,25 @@ unsigned long int MPU_Loop_Hz=0 , MPU_Loop_Cnt=0;
 unsigned long int DXL_Loop_Hz=0 , DXL_Loop_Cnt=0;
 unsigned long int WEL_Loop_Hz=0 , WEL_Loop_Cnt=0;
 unsigned long int RSL_Loop_Hz=0 , RSL_Loop_Cnt=0;
+unsigned long int SUB_Loop_Hz=0 , SUB_Loop_Cnt=0;
 
 double MPU_X=0, MPU_Y=0, MPU_Z=0;
 double Gyro_X=0, Gyro_Y=0;
 double WEP[100];
-double System_Voltage=160;
+double System_Voltage=160; //defult voltage
 byte   Actuators_Update=1;
 
 //walk engine arrays for update robot inverse kinematic
-double L_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
-double R_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
-double L_Arm[6];     // pitch, roll, elbow, vp, vr, ve
-double R_Arm[6];     // pitch, roll, elbow, vp, vr, ve
+//double L_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
+//double R_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
+//double L_Arm[6];     // pitch, roll, elbow, vp, vr, ve
+//double R_Arm[6];     // pitch, roll, elbow, vp, vr, ve
 
 //walk engine parameters (these are sent from PC)
 //main walk parameters
-double Vx=0.0;        //velocity of X (forward) direction from PC
-double Vy=0.0;        //velocity of Y (sideward) direction
-double Vt=0.0;        //velocity of T (rotate) speed
+double Vx=0.0;          //velocity of X (forward) direction from PC
+double Vy=0.0;          //velocity of Y (sideward) direction
+double Vt=0.0;          //velocity of T (rotate) speed
 byte   Motion_Ins=0;    //the motion request (from pc and must be run in real-time)
 byte   Internal_Motion_Request=0;
 byte   Check_Robot_Fall=1;
@@ -83,7 +87,7 @@ void setup() {
   SerialUSB.attachInterrupt(UsbInterrupt);
   
     //Serial2 Serial initialize
-  Serial2.begin(115200); 
+  Serial2.begin(2000000); 
   
   //initialize Dynamixel defult bus (1000000bps) 5=3000000
   Dxl.begin(Boudrate_1000000bps);
@@ -102,10 +106,10 @@ void setup() {
     //initialize internal timer
   RTC_Setup_Timer(1000000);         //initialize RTC for 1 mili secound
   
+  xTaskCreate( vWalk_Engine_Task,      ( signed char * ) "Walk_Engine_Task"       , 512, NULL, 100, NULL );
   xTaskCreate( vRobot_State_Task,      ( signed char * ) "Robot_State"            , 128, NULL, 1, NULL );
-  xTaskCreate( vMPU_Kalman_Task,       ( signed char * ) "MPU_Kalman"             , 512, NULL, 1, NULL );
+  xTaskCreate( vMPU_Kalman_Task,       ( signed char * ) "MPU_Kalman"             , 256, NULL, 1, NULL );
   xTaskCreate( vDynamixel_Update_Task, ( signed char * ) "Dynamixel_Update_Task"  , 256, NULL, 1, NULL );
-  xTaskCreate( vWalk_Engine_Task,      ( signed char * ) "Walk_Engine_Task"       , 512, NULL, 5, NULL );
   xTaskCreate( vSerial_USB_Tx_Task,    ( signed char * ) "Serial_Tx"              , 128, NULL, 1, NULL );
 
   vTaskStartScheduler();

@@ -24,7 +24,7 @@ void vMPU_Kalman_Task( void *pvParameters ){
   
   Serial2.print("AUT_UofM:> Configuration MPU-9150...");
   MPU.init(); //initialize MPU
-  MPU.initDrift(10); //calculate drrift
+  MPU.initDrift(20); //calculate drrift
   Serial2.println("OK!");
   xTaskResumeAll();
   
@@ -47,6 +47,10 @@ void vMPU_Kalman_Task( void *pvParameters ){
   for( ;; ){
     MPU_Loop_Cnt++;    
     Calculate_Euler_Angles();
+    
+    //if(Debug_Mode){
+    //  RTOS_Error_Log("MPU Task:",MPU_Loop_Cnt);
+    //}
     
     digitalWrite(BLUE_LED_485EXP, HIGH); 
     vTaskDelayUntil( &xLastWakeTime, xFrequency );

@@ -27,7 +27,8 @@ void vWalk_Engine_Task( void *pvParameters ){
   //main task loop
   for( ;; ){ 
     //if (!(WEL_Loop_Cnt==1)) 
-    togglePin(RED_LED_485EXP);  
+    togglePin(RED_LED_485EXP);
+    
     //Robot_State();
     
     if ((((Vx!=0) ||(Vy!=0)||(Vt!=0)) && (Motion_Ins==No_Motion) && (Internal_Motion_Request==No_Motion )) && (System_Voltage>=(int)WEP[P_Min_Voltage_Limit])) {
@@ -35,10 +36,7 @@ void vWalk_Engine_Task( void *pvParameters ){
        WEP[P_Left_Leg_Y_Offset]=-50;
        WEP[P_Right_Leg_Y_Offset]=50;
        Stand_Init_T(1.0,2);
-       //Stand_Init(0.5);
        Set_Walk_Engine_Parameters((byte)Teen_Size_Robot_Num);
-       //Stand_Init_T(1.0,50);
-       //vTaskDelay(80);
        Omni_Gait(WEP[Vx_Offset],WEP[Vy_Offset],WEP[Vt_Offset]); //execute omni-directional start gait
        
        //main gait
@@ -53,6 +51,11 @@ void vWalk_Engine_Task( void *pvParameters ){
     }
     else{
       WEL_Loop_Cnt++;
+      
+      //if(Debug_Mode){
+      //  RTOS_Error_Log("WEL Task:",WEL_Loop_Cnt);
+      //}
+    
       //firts run gait generation with vx=vy=vt=0 for semi gait generation to stand position
       if (Internal_Motion_Request==No_Motion ){
         Stand_Init(0.5);
@@ -145,10 +148,19 @@ void vWalk_Engine_Task( void *pvParameters ){
 }
 
 //omni directional gaite generation
-void Omni_Gait(double vx, double vy, double vt){  
+void Omni_Gait(double vx, double vy, double vt){
+  double L_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
+  double R_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
+  double L_Arm[6];     // pitch, roll, elbow, vp, vr, ve
+  double R_Arm[6];     // pitch, roll, elbow, vp, vr, ve
+
   //gait generate with for loop form  0~3.14
   for(double t=0; t<=TwoPi ;t+=WEP[P_Motion_Resolution]){ 
     WEL_Loop_Cnt++;
+    
+    //if(Debug_Mode){
+    //    RTOS_Error_Log("WEL Task:",WEL_Loop_Cnt);
+    //}
    
     if (Vx >  0.5)  Vx=  0.5;
     if (Vx < -0.5)  Vx= -0.5;
@@ -168,7 +180,7 @@ void Omni_Gait(double vx, double vy, double vt){
         vTaskDelay(WEP[P_Single_Support_Sleep]);
     }
     
-    noInterrupts(); 
+    //noInterrupts(); 
     //right leg initialize
     //if t<pi the right leg in fly state and other wise in support state
     R_Leg_Ik[I_X]     = (-(cos(t)*(vx*100.0)))+ (vx * WEP[P_Body_X_Swing_Gain] * 100.0); 
@@ -187,7 +199,7 @@ void Omni_Gait(double vx, double vy, double vt){
     L_Leg_Ik[I_Roll]  = (t>=Pi) ? (sin(t)*(WEP[P_Fly_Roll_Gain])) : (sin(t)*(WEP[P_Support_Roll_Gain])); 
     L_Leg_Ik[I_Pitch] = (t>=Pi) ? 0.0 : (sin(t-Pi)*WEP[P_Support_Pitch_Gain]);
     L_Leg_Ik[I_Yaw]   = (cos(t-Pi)*(vt)); //(cos(t-Pi)*(vt));
-    interrupts();
+    //interrupts();
     
     //right arm initialize
     R_Arm[I_A_Pitch]   = ((cos(t)) * vx * 1.3); // + Arm_Hopping_Val; // + ((MPU_X+Get_E_Param(Addr_IMU_X_Angle_Offset)) * Get_E_Param(Addr_Stablizer_Arm_Pitch_Gain)*2);
@@ -279,6 +291,11 @@ void Init_Robot_First(){
 
 //initialize robot to stand
 void Stand_Init(double _Speed){
+  double L_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
+  double R_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
+  double L_Arm[6];     // pitch, roll, elbow, vp, vr, ve
+  double R_Arm[6];     // pitch, roll, elbow, vp, vr, ve
+
   //right leg initialize
   R_Leg_Ik[I_X]     =0.0; 
   R_Leg_Ik[I_Y]     =0.0;
@@ -299,17 +316,17 @@ void Stand_Init(double _Speed){
   R_Arm[I_A_Pitch]   =0.0;
   R_Arm[I_A_Roll]    =0.0;
   R_Arm[I_A_Elbow]   =0.0;
-  R_Arm[I_A_Vp]      =0.5;
-  R_Arm[I_A_Vr]      =0.5;
-  R_Arm[I_A_Ve]      =0.5;
+  R_Arm[I_A_Vp]      =_Speed;
+  R_Arm[I_A_Vr]      =_Speed;
+  R_Arm[I_A_Ve]      =_Speed;
   
   //left arm initialize
   L_Arm[I_A_Pitch]   =0.0;
   L_Arm[I_A_Roll]    =0.0;
   L_Arm[I_A_Elbow]   =0.0;
-  L_Arm[I_A_Vp]      =0.5;
-  L_Arm[I_A_Vr]      =0.5;
-  L_Arm[I_A_Ve]      =0.5;
+  L_Arm[I_A_Vp]      =_Speed;
+  L_Arm[I_A_Vr]      =_Speed;
+  L_Arm[I_A_Ve]      =_Speed;
   
   //update robotis joints
   Update_Ik(_Speed, _Speed, R_Leg_Ik, L_Leg_Ik, R_Arm, L_Arm);
@@ -317,39 +334,44 @@ void Stand_Init(double _Speed){
 
 //initialize robot to stand
 void Stand_Init_T(double _Speed, unsigned int T){
+  double L_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
+  double R_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
+  double L_Arm[6];     // pitch, roll, elbow, vp, vr, ve
+  double R_Arm[6];     // pitch, roll, elbow, vp, vr, ve
+
   //update robotis joints
   for(unsigned int Cnt=0;Cnt<=T;Cnt++){
-  //right leg initialize
-  R_Leg_Ik[I_X]     =0.0; 
-  R_Leg_Ik[I_Y]     =0.0;
-  R_Leg_Ik[I_Z]     =0.0;
-  R_Leg_Ik[I_Roll]  =0.0;
-  R_Leg_Ik[I_Pitch] =0.0;
-  R_Leg_Ik[I_Yaw]   =0.0;
+    //right leg initialize
+    R_Leg_Ik[I_X]     =0.0; 
+    R_Leg_Ik[I_Y]     =0.0;
+    R_Leg_Ik[I_Z]     =0.0;
+    R_Leg_Ik[I_Roll]  =0.0;
+    R_Leg_Ik[I_Pitch] =0.0;
+    R_Leg_Ik[I_Yaw]   =0.0;
   
-  //left leh initialize
-  L_Leg_Ik[I_X]     =0.0; 
-  L_Leg_Ik[I_Y]     =0.0;
-  L_Leg_Ik[I_Z]     =0.0;
-  L_Leg_Ik[I_Roll]  =0.0;
-  L_Leg_Ik[I_Pitch] =0.0;
-  L_Leg_Ik[I_Yaw]   =0.0;
-  
-  //right arm initialize
-  R_Arm[I_A_Pitch]   =0.0;
-  R_Arm[I_A_Roll]    =0.0;
-  R_Arm[I_A_Elbow]   =0.0;
-  R_Arm[I_A_Vp]      =0.5;
-  R_Arm[I_A_Vr]      =0.5;
-  R_Arm[I_A_Ve]      =0.5;
-  
-  //left arm initialize
-  L_Arm[I_A_Pitch]   =0.0;
-  L_Arm[I_A_Roll]    =0.0;
-  L_Arm[I_A_Elbow]   =0.0;
-  L_Arm[I_A_Vp]      =0.5;
-  L_Arm[I_A_Vr]      =0.5;
-  L_Arm[I_A_Ve]      =0.5;
+    //left leh initialize
+    L_Leg_Ik[I_X]     =0.0; 
+    L_Leg_Ik[I_Y]     =0.0;
+    L_Leg_Ik[I_Z]     =0.0;
+    L_Leg_Ik[I_Roll]  =0.0;
+    L_Leg_Ik[I_Pitch] =0.0;
+    L_Leg_Ik[I_Yaw]   =0.0;
+    
+    //right arm initialize
+    R_Arm[I_A_Pitch]   =0.0;
+    R_Arm[I_A_Roll]    =0.0;
+    R_Arm[I_A_Elbow]   =0.0;
+    R_Arm[I_A_Vp]      =_Speed;
+    R_Arm[I_A_Vr]      =_Speed;
+    R_Arm[I_A_Ve]      =_Speed;
+    
+    //left arm initialize
+    L_Arm[I_A_Pitch]   =0.0;
+    L_Arm[I_A_Roll]    =0.0;
+    L_Arm[I_A_Elbow]   =0.0;
+    L_Arm[I_A_Vp]      =_Speed;
+    L_Arm[I_A_Vr]      =_Speed;
+    L_Arm[I_A_Ve]      =_Speed;
   
     Update_Ik(_Speed, _Speed, R_Leg_Ik, L_Leg_Ik, R_Arm, L_Arm);
     vTaskDelay(20);

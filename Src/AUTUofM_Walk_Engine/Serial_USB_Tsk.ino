@@ -10,10 +10,7 @@
 #define Request_Euler_State          1
 #define Request_Parameter            2
 
-byte PData[16];
-byte USB_Request=0;
-
-void vSerial_USB_Tx_Task( void *pvParameters ){
+void vSerial_USB_Tx_Task(void *pvParameters ){
   
   vTaskSuspendAll();
   Serial2.println("AUT_UofM:> USB Tx Task Start Sucssecfully!");
@@ -24,8 +21,13 @@ void vSerial_USB_Tx_Task( void *pvParameters ){
   xLastWakeTime = xTaskGetTickCount ();
   
   //main task loop
-  for( ;; ){    
+  for( ;; ){   
+    SUB_Loop_Cnt++;
     Send_Euler_State();
+    
+    //if(Debug_Mode){
+    //  RTOS_Error_Log("SUB Task:",SUB_Loop_Cnt);
+    //}
     
     digitalWrite(GREEN_LED_485EXP, 0);   
     vTaskDelayUntil( &xLastWakeTime, xFrequency ); 
@@ -38,6 +40,8 @@ void vSerial_USB_Tx_Task( void *pvParameters ){
 */
 void Send_Euler_State(){
   
+   byte PData[10];
+   
    PData[0]=(byte)254;
    PData[1]=(byte)254;
    PData[2]=(byte)100;

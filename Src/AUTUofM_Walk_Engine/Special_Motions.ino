@@ -21,6 +21,11 @@ void Motion_Stand_Up_Back(byte Robot_Num){
 }
 
 void Run_R_Kik_Motion(byte Robot_Num){
+  double L_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
+  double R_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
+  double L_Arm[6];     // pitch, roll, elbow, vp, vr, ve
+  double R_Arm[6];     // pitch, roll, elbow, vp, vr, ve
+
   //akbar
   if (Robot_Num==0){
     double Go_To_Leg          =65; //*
@@ -163,13 +168,14 @@ void Run_R_Kik_Motion(byte Robot_Num){
       vTaskDelay(7);
     }//main gait timi for ins 
   }
-
-
-  
-  
 }
 
 void Run_L_Kik_Motion(byte Robot_Num){
+  double L_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
+  double R_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
+  double L_Arm[6];     // pitch, roll, elbow, vp, vr, ve
+  double R_Arm[6];     // pitch, roll, elbow, vp, vr, ve
+
   // Ten Size Akbar=0  Asghar=1
   for(int i=0;i<=50;i++){
    delay(10);

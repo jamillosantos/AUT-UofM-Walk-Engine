@@ -117,12 +117,12 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_IMU_Y_Angle_Offset]=-0.03;               
     
     //MPU filtering parametrs 
-    WEP[P_Gyro_X_LowPass_Gain]=0.6;              
+    WEP[P_Gyro_X_LowPass_Gain]=0.85;              
     WEP[P_Gyro_Y_LowPass_Gain]=0.7;             
     
     //kalman filter r mesurement value
-    WEP[P_Kalman_Roll_RM_Rate]=80;               
-    WEP[P_Kalman_Pitch_RM_Rate]=40;             
+    WEP[P_Kalman_Roll_RM_Rate]=500;               
+    WEP[P_Kalman_Pitch_RM_Rate]=200;             
     WEP[P_Kalman_Yaw_RM_Rate]=50;                
     
     //smoothing ratio
@@ -173,7 +173,7 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_Fly_Yaw_Gain]=0;                     
     WEP[P_Fly_X_Swing_Gain]=0;                  
     WEP[P_Fly_Y_Swing_Gain]=0.05;                  
-    WEP[P_Fly_Z_Swing_Gain]=0.75;                   
+    WEP[P_Fly_Z_Swing_Gain]=0.7;                   
     WEP[P_Support_Roll_Gain]=0.1;               
     WEP[P_Support_Pitch_Gain]=0;                
     WEP[P_Support_Yaw_Gain]=0;               
@@ -262,11 +262,11 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_IMU_Y_Angle_Offset]= -0.05;
     
     //MPU filtering parametrs 
-    WEP[P_Gyro_X_LowPass_Gain]=0.85;              
+    WEP[P_Gyro_X_LowPass_Gain]=09;              
     WEP[P_Gyro_Y_LowPass_Gain]=0.7;             
     
     //kalman filter r mesurement value
-    WEP[P_Kalman_Roll_RM_Rate]=500;               
+    WEP[P_Kalman_Roll_RM_Rate]=800;               
     WEP[P_Kalman_Pitch_RM_Rate]=200;             
     WEP[P_Kalman_Yaw_RM_Rate]=50;                
     

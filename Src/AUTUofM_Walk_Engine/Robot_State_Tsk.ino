@@ -20,18 +20,27 @@ void vRobot_State_Task( void *pvParameters ){
     
     RSL_Loop_Cnt++;
     
+    //if(Debug_Mode){
+    //  RTOS_Error_Log("RST Task:",RSL_Loop_Cnt);
+    //}
+    
     //run motion if key pressed
     if(digitalRead(BUTTON1_485EXP) == 1){
       Motion_Ins=Motion_1;   
       Serial2.println("AUT_UofM:> Key Presed!");
     }
     
+    //if(digitalRead(BUTTON2_485EXP) == 1){
+    //  RTOS_Error_Log("Key 2 Pressed!");
+    //}
+    
+    
     //
     if(digitalRead(11) == 1){
       Internal_Motion_Request=Stop_Motion;
     }
     else{
-      Internal_Motion_Request=No_Motion;
+      Internal_Motion_Request=No_Motion;  //release the robot stop
     }
     
     /*

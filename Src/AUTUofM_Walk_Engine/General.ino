@@ -4,6 +4,9 @@ void UsbInterrupt(byte* buffer, byte nCount){
   vTaskSuspendAll();
   if(nCount==13){
     digitalWrite(BOARD_LED_PIN,LOW);
+    //if(Debug_Mode){
+    //  RTOS_Error_Log("USB Int:",nCount);
+    //}
     if((buffer[0]==254) && (buffer[1]==254)){
                 //walk data update
                 unsigned long T =((unsigned long) ((unsigned long)(buffer[3]<<8) + ((byte)buffer[2])));
@@ -70,13 +73,18 @@ void RTC_INT(void) {
   DXL_Loop_Hz=DXL_Loop_Cnt; DXL_Loop_Cnt=0;
   WEL_Loop_Hz=WEL_Loop_Cnt; WEL_Loop_Cnt=0;  
   RSL_Loop_Hz=RSL_Loop_Cnt; RSL_Loop_Cnt=0;
+  SUB_Loop_Hz=SUB_Loop_Cnt; SUB_Loop_Cnt=0;
   
-  /*
-  Serial2.print("AUT_UofM:> MPU="); Serial2.print(MPU_Loop_Hz); Serial2.print("Hz");
+  //if(Debug_Mode){
+  //   RTOS_Error_Log("RTC Clock:",millis());
+  //}
+  
+  Serial2.print("AUT_UofM:>");
+  Serial2.print("\t MPU=");Serial2.print(MPU_Loop_Hz); Serial2.print("Hz");
   Serial2.print("\t DXL=");Serial2.print(DXL_Loop_Hz); Serial2.print("Hz");
-  Serial2.print("\t WEL=");Serial2.print(WEL_Loop_Hz);Serial2.println("Hz");
-  */
-  
+  Serial2.print("\t WEL=");Serial2.print(WEL_Loop_Hz); Serial2.print("Hz");
+  Serial2.print("\t RSL=");Serial2.print(RSL_Loop_Hz); Serial2.print("Hz");
+  Serial2.print("\t SUB=");Serial2.print(SUB_Loop_Hz);Serial2.println("Hz");
 }
 
 /*
@@ -99,22 +107,36 @@ void Initialize_Expander_Pins(){
  initialize onboard pins
 */
 void initialize_Onboard_Pins(){
-  pinMode(BOARD_LED_PIN   , OUTPUT);   //config onboard led
-  pinMode(BOARD_BUTTON_PIN, INPUT_PULLDOWN);  //configh onboard micro switch
-  pinMode(Buzzer_Pin      , OUTPUT);
-  digitalWrite(Buzzer_Pin , LOW);
+  pinMode(BOARD_LED_PIN     , OUTPUT);   //config onboard led
+  pinMode(BOARD_BUTTON_PIN  , INPUT_PULLDOWN);  //configh onboard micro switch
+  pinMode(Buzzer_Pin        , OUTPUT);
+  digitalWrite(Buzzer_Pin   , LOW);
   
   pinMode(10, OUTPUT);
   pinMode(11, INPUT_PULLDOWN);
   digitalWrite(10, HIGH);
 }
 
+//set the buzzer for a time
 void Buzzer(unsigned int Time){
   digitalWrite(Buzzer_Pin, HIGH);
   delay(Time);
   digitalWrite(Buzzer_Pin, LOW);
 }
 
+void RTOS_Error_Log(char * P){
+  vTaskSuspendAll();
+  Serial2.print("AUT_UofM:> ");Serial2.println(P);
+  xTaskResumeAll();
+}
+
+void RTOS_Error_Log(char * P, int i){
+  vTaskSuspendAll();
+  Serial2.print("AUT_UofM:> ");Serial2.print(P);Serial2.println(i);
+  xTaskResumeAll();
+}
+
+//calculate the polynomilan function
 double Poly_Calculate(double x, double* coefficients, int degree)
 {
     double pows[degree];
