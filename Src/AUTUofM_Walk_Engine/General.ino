@@ -69,22 +69,18 @@ void RTC_Setup_Timer(long Period){
 * this interrupt will heald in every 1 sec
 */
 void RTC_INT(void) { 
-  MPU_Loop_Hz=MPU_Loop_Cnt; MPU_Loop_Cnt=0;
-  DXL_Loop_Hz=DXL_Loop_Cnt; DXL_Loop_Cnt=0;
+  DCM_Loop_Hz=DCM_Loop_Cnt; DCM_Loop_Cnt=0;
   WEL_Loop_Hz=WEL_Loop_Cnt; WEL_Loop_Cnt=0;  
   RSL_Loop_Hz=RSL_Loop_Cnt; RSL_Loop_Cnt=0;
-  SUB_Loop_Hz=SUB_Loop_Cnt; SUB_Loop_Cnt=0;
   
   //if(Debug_Mode){
   //   RTOS_Error_Log("RTC Clock:",millis());
   //}
   
   Serial2.print("AUT_UofM:>");
-  Serial2.print("\t MPU=");Serial2.print(MPU_Loop_Hz); Serial2.print("Hz");
-  Serial2.print("\t DXL=");Serial2.print(DXL_Loop_Hz); Serial2.print("Hz");
+  Serial2.print("\t DCM=");Serial2.print(DCM_Loop_Hz); Serial2.print("Hz");
   Serial2.print("\t WEL=");Serial2.print(WEL_Loop_Hz); Serial2.print("Hz");
-  Serial2.print("\t RSL=");Serial2.print(RSL_Loop_Hz); Serial2.print("Hz");
-  Serial2.print("\t SUB=");Serial2.print(SUB_Loop_Hz);Serial2.println("Hz");
+  Serial2.print("\t RSL=");Serial2.print(RSL_Loop_Hz); Serial2.println("Hz");
 }
 
 /*
@@ -148,4 +144,36 @@ double Poly_Calculate(double x, double* coefficients, int degree)
         y += coefficients[i] * pows[i];
     }
     return y;
+}
+
+
+
+/* 
+* send Euler state to the USB serial Port
+*/
+void Send_Euler_State(){
+  
+   byte PData[10];
+   
+   PData[0]=(byte)254;
+   PData[1]=(byte)254;
+   PData[2]=(byte)100;
+   
+   unsigned long T =(unsigned long)((MPU_X+Pi) * 1000);         
+   PData[3]= _LOBYTE(T);
+   PData[4]= _HIBYTE(T);
+      
+   T =(unsigned long)((MPU_Y+Pi)*1000); 
+   PData[5]= _LOBYTE(T);
+   PData[6]= _HIBYTE(T);
+   
+   T =(unsigned long)((MPU_Z+Pi)*1000); 
+   PData[7]= _LOBYTE(T);
+   PData[8]= _HIBYTE(T);
+    
+   for(byte i=0;i<=8;i++){
+      noInterrupts();
+      SerialUSB.print((char)PData[i]);
+      interrupts();
+   } 
 }

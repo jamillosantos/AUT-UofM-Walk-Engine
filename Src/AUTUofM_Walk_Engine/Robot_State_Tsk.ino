@@ -1,3 +1,15 @@
+//define instraction for communicate with PC...
+#define Ins_Set_Walk                 201  
+#define Ins_Set_Head_Joints          202  
+#define Ins_Get_Euler_States         203  
+
+#define Ins_Set_Parameter            204  
+#define Ins_Get_Parameter            205  
+
+#define No_Request                   0
+#define Request_Euler_State          1
+#define Request_Parameter            2
+
 //Robot State Main Task
 void vRobot_State_Task( void *pvParameters ){
   
@@ -6,7 +18,7 @@ void vRobot_State_Task( void *pvParameters ){
   xTaskResumeAll();
   
   portTickType xLastWakeTime;
-  const portTickType xFrequency = 50;  //10ms for each loop run time means 100Hz of task frequency
+  const portTickType xFrequency = 100;  //10ms for each loop run time means 100Hz of task frequency
   xLastWakeTime = xTaskGetTickCount ();
   vTaskDelay(500);
   
@@ -23,6 +35,10 @@ void vRobot_State_Task( void *pvParameters ){
     //if(Debug_Mode){
     //  RTOS_Error_Log("RST Task:",RSL_Loop_Cnt);
     //}
+    
+    vTaskSuspendAll();
+    Send_Euler_State();
+    xTaskResumeAll();
     
     //run motion if key pressed
     if(digitalRead(BUTTON1_485EXP) == 1){

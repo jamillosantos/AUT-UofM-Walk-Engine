@@ -8,8 +8,6 @@ void vWalk_Engine_Task( void *pvParameters ){
   vTaskSuspendAll();
   Serial2.print("AUT_UofM:> Configure Robot Walk Engine...");  
   Init_Robot_First();
-  Buzzer(50);
-  vTaskDelay(10);
   Vx=0.0;     //velocity of X (forward) direction from PC (min -1 to max 1)
   Vy=0.0;        //velocity of Y (sideward) direction
   Vt=0.0;        //velocity of T (rotate) speed (per radian)  
@@ -18,9 +16,8 @@ void vWalk_Engine_Task( void *pvParameters ){
   xTaskResumeAll();
   
   //stand for first time
-  //Stand_Init(1.0, 500);
   Stand_Init_T(0.05,300);
-  //vTaskDelay(2000); 
+
   //get robot state
   Robot_State();
   
@@ -65,7 +62,7 @@ void vWalk_Engine_Task( void *pvParameters ){
         Stand_Init(0.1);
       }
       
-      vTaskDelay(20);
+      vTaskDelay(30);
       
       //run standup motions
       switch(Internal_Motion_Request) { //check for instrcation
