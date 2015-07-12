@@ -23,10 +23,7 @@ void vWalk_Engine_Task( void *pvParameters ){
   
   //main task loop
   for( ;; ){ 
-    //if (!(WEL_Loop_Cnt==1)) 
     togglePin(RED_LED_485EXP);
-    
-    //Robot_State();
     
     if ((((Vx!=0) ||(Vy!=0)||(Vt!=0)) && (Motion_Ins==No_Motion) && (Internal_Motion_Request==No_Motion )) && (System_Voltage>=(int)WEP[P_Min_Voltage_Limit])) {
        //start gait
@@ -94,7 +91,7 @@ void vWalk_Engine_Task( void *pvParameters ){
                  //run motion 1
                  Stand_Init_T(1.0, 100);
                  Run_R_Kik_Motion((byte)Teen_Size_Robot_Num);
-                 Stand_Init_T(1.0, 100);
+                 Stand_Init_T(1.0, 50);
                  Motion_Ins=No_Motion;
                  }
                  break;
@@ -102,7 +99,7 @@ void vWalk_Engine_Task( void *pvParameters ){
                  //run motion 2
                  Stand_Init_T(1.0, 100);
                  Run_L_Kik_Motion((byte)Teen_Size_Robot_Num);
-                 Stand_Init_T(1.0, 100);
+                 Stand_Init_T(1.0, 50);
                  Motion_Ins=No_Motion;
                  break;
             case (byte)Motion_3:
@@ -150,7 +147,9 @@ void Omni_Gait(double vx, double vy, double vt){
   double R_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
   double L_Arm[6];     // pitch, roll, elbow, vp, vr, ve
   double R_Arm[6];     // pitch, roll, elbow, vp, vr, ve
-
+  
+  double Joint_Speed = 0.5;
+  
   //gait generate with for loop form  0~3.14
   for(double t=0; t<=TwoPi ;t+=WEP[P_Motion_Resolution]){ 
     WEL_Loop_Cnt++;
@@ -215,7 +214,7 @@ void Omni_Gait(double vx, double vy, double vt){
     L_Arm[I_A_Ve]      = 0.05;
   
     //update robotis joints
-    Update_Ik(0.5, 0.5, R_Leg_Ik, L_Leg_Ik, R_Arm, L_Arm); 
+    Update_Ik(Joint_Speed, Joint_Speed, R_Leg_Ik, L_Leg_Ik, R_Arm, L_Arm); 
     vTaskDelay(WEP[P_Gait_Frequency]*100);
   }//main gait timi for ins
 }

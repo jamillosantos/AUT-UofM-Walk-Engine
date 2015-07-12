@@ -22,12 +22,12 @@
 #define Id_Head_Tilt                 31
 
 //this is fix for humanoid with 20 DOF
-#define NUM_OF_DXL                  (18)  
+#define NUM_OF_DXL                   18  
 
-#define MPU_GY80_VCC_Pin      8
-#define MPU_GY80_GND_Pin      7
-#define MPU_GY80_SCL_Pin      6
-#define MPU_GY80_SDA_Pin      5
+#define MPU_GY80_VCC_Pin             8
+#define MPU_GY80_GND_Pin             7
+#define MPU_GY80_SCL_Pin             6
+#define MPU_GY80_SDA_Pin             5
 
 //global array for set joint angle
 double Angle[NUM_OF_DXL];

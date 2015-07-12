@@ -1791,7 +1791,6 @@ void  Motion_Stand_Up_Back_2(){
   Angle[Id_Left_Arm_Pitch]= -90*DEG2RAD;
   Angle[Id_Left_Arm_Roll] = 0*DEG2RAD;
   Angle[Id_Left_Arm_Elbow]= 90*DEG2RAD;
-  
  
   //set right leg speeds
   Speed[Id_Right_Hip_Yaw]    = _Speed;
@@ -1826,8 +1825,6 @@ void  Motion_Stand_Up_Back_2(){
   
   Angle[Id_Right_Foot_Pitch] =-45*DEG2RAD + WEP[P_Right_Leg_Foot_Pitch_Offset];
   Angle[Id_Left_Foot_Pitch]  =-45*DEG2RAD + WEP[P_Left_Leg_Foot_Pitch_Offset];  
- 
-  
   }
   //***********************************************************************************************************
     for(int i=0;i<=30;i++){

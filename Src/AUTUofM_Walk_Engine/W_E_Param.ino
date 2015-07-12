@@ -7,8 +7,8 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
   WEP[P_Min_Voltage_Limit]=130; //128 voltage minimum for loop and buzzer error
   
   //fall thershold
-  WEP[P_Fall_Roll_Thershold] =0.5;              
-  WEP[P_Fall_Pitch_Thershold]=0.5; 
+  WEP[P_Fall_Roll_Thershold] =0.6;              
+  WEP[P_Fall_Pitch_Thershold]=0.6; 
     
   //akbar
   if (Robot_Num==0){

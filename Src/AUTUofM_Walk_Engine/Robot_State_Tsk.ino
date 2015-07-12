@@ -43,7 +43,7 @@ void vRobot_State_Task( void *pvParameters ){
     //run motion if key pressed
     if(digitalRead(BUTTON1_485EXP) == 1){
       Motion_Ins=Motion_1;   
-      Serial2.println("AUT_UofM:> Key Presed!");
+      //Serial2.println("AUT_UofM:> Key Presed!");
     }
     
     //if(digitalRead(BUTTON2_485EXP) == 1){
@@ -71,7 +71,7 @@ void vRobot_State_Task( void *pvParameters ){
     //check for voltage and error if..
     if(System_Voltage<=(int)(WEP[P_Min_Voltage_Limit]+2)){
       togglePin(Buzzer_Pin);
-      Serial2.println("AUT_UofM:> LOW Woltage! ERROR... v="); Serial2.println(System_Voltage);
+      //Serial2.println("AUT_UofM:> LOW Woltage! ERROR... v="); Serial2.println(System_Voltage);
     }
     else{
       digitalWrite(Buzzer_Pin, LOW);
