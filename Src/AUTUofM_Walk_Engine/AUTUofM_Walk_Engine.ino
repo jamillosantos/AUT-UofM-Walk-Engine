@@ -106,10 +106,10 @@ void setup() {
     //initialize internal timer
   RTC_Setup_Timer(1000000);         //initialize RTC for 1 mili secound
   
-  xTaskCreate( vWalk_Engine_Task,      ( signed char * ) "Walk_Engine_Task"       , 512, NULL, 100, NULL );
+  xTaskCreate( vWalk_Engine_Task,      ( signed char * ) "Walk_Engine_Task"       , 512, NULL, 10, NULL );
   xTaskCreate( vRobot_State_Task,      ( signed char * ) "Robot_State"            , 128, NULL, 1, NULL );
-  xTaskCreate( vMPU_Kalman_Task,       ( signed char * ) "MPU_Kalman"             , 256, NULL, 1, NULL );
-  xTaskCreate( vDynamixel_Update_Task, ( signed char * ) "Dynamixel_Update_Task"  , 256, NULL, 1, NULL );
+  xTaskCreate( vMPU_Kalman_Task,       ( signed char * ) "MPU_Kalman"             , 128, NULL, 1, NULL );
+  xTaskCreate( vDynamixel_Update_Task, ( signed char * ) "Dynamixel_Update_Task"  , 128, NULL, 1, NULL );
   xTaskCreate( vSerial_USB_Tx_Task,    ( signed char * ) "Serial_Tx"              , 128, NULL, 1, NULL );
 
   vTaskStartScheduler();
