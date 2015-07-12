@@ -165,7 +165,7 @@ void Set_Head(double Pan, double Tilt, double Pan_Speed, double Tilt_Speed){
 void DXL_Write_Head(){
   vTaskSuspendAll();
   Dxl.setPosition(Id_Head_Pan,2048+(((int)((Head_Pan_Angle*RAD2DEG)*DEG2DXL))*1),(int)Head_Pan_Speed);
-  Dxl.setPosition(Id_Head_Tilt,2048+(((int)((Head_Tilt_Angle*RAD2DEG)*DEG2DXL))*1),(int)Head_Tilt_Speed);  
+  Dxl.setPosition(Id_Head_Tilt,2048+(((int)(((Head_Tilt_Angle-MPU_X)*RAD2DEG)*DEG2DXL))*1),(int)Head_Tilt_Speed);  
   xTaskResumeAll();
 }
 
@@ -316,14 +316,14 @@ void Calculate_Euler_Angles(){
     //calculate deltaT for kalman filter calculation
     dt = (double)((micros() - PrevTime) / 1000000.0); // Calculate delta time
     PrevTime = micros(); 
-    if(dt>100.0)dt=0.0001;    
+    //if(dt>100.0)dt=0.0001;    
     
     vTaskSuspendAll();  
     MPU.init_Mag(); 
     MPU.ReadXYZ(); //read all data from MPU and normalize them  
     xTaskResumeAll();
     
-    vTaskSuspendAll();
+    //vTaskSuspendAll();
     //calculate kalman filter of x,y,z
     MPU_Angle_X = (kalmanX.getAngle((atan(MPU.get_Az() / sqrt((MPU.get_Ax() * MPU.get_Ax()) + (MPU.get_Ay() * MPU.get_Ay()))) * RAD_TO_DEG), -MPU.get_Gx(), dt))*DEG2RAD; // Calculate the angle using a Kalman filter    
     MPU_X = MPU_Angle_X + WEP[P_IMU_X_Angle_Offset];
@@ -331,7 +331,8 @@ void Calculate_Euler_Angles(){
     MPU_Y = MPU_Angle_Y + WEP[P_IMU_Y_Angle_Offset];
     MPU_Angle_Z = (0.5 * MPU_Angle_Z) + (0.5 * (atan2 ( MPU._getRaw_CX() , MPU._getRaw_CY() ) * RAD_TO_DEG));
     MPU_Z = MPU_Angle_Z * DEG2RAD; 
-    xTaskResumeAll(); 
+    //xTaskResumeAll(); 
+    
     //XQueue.forcePush(MPU_X);
     //YQueue.forcePush(MPU_Y);
     

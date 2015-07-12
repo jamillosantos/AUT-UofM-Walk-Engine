@@ -9,20 +9,24 @@ void UsbInterrupt(byte* buffer, byte nCount){
     //}
     if((buffer[0]==254) && (buffer[1]==254)){
                 //walk data update
-                unsigned long T =((unsigned long) ((unsigned long)(buffer[3]<<8) + ((byte)buffer[2])));
-                double tVx=(T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
+                unsigned long T=0;
+                T =((unsigned long) ((unsigned long)(buffer[3]<<8) + ((byte)buffer[2])));
+                double tVx=0.0;
+                tVx =(T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
                 if((tVx>-1.0) && (tVx<1.0)){
                   Vx=tVx; 
                 }
                 
                 T =((unsigned long) ((unsigned long)(buffer[5]<<8) + ((byte)buffer[4])));
-                double tVy= (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
+                double tVy=0.0;
+                tVy = (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
                 if((tVy>-1.0) && (tVy<1.0)){
                   Vy=tVy;
                 }
                       
                 T =((unsigned long) ((unsigned long)(buffer[7]<<8) + ((byte)buffer[6])));
-                double tVt= (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
+                double tVt=0.0;
+                tVt = (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
                 if((tVt>-1.0) && (tVt<1.0)){
                   Vt=tVt;
                 }
@@ -33,10 +37,12 @@ void UsbInterrupt(byte* buffer, byte nCount){
                     
                 //head data update
                 T =((unsigned long) ((unsigned long)(buffer[10] << 8) + ((byte)buffer[9])));
-                double Pan_Angle= (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));       
+                double Pan_Angle=0.0;
+                Pan_Angle = (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));       
                 
                 T =((unsigned long) ((unsigned long)(buffer[12] << 8) + ((byte)buffer[11])));
-                double Tilt_Angle= (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
+                double Tilt_Angle=0.0;
+                Tilt_Angle = (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
                 
                 if (Internal_Motion_Request==No_Motion ){
                   //Serial2.print("AUT_UofM:> Head Pan:"); Serial2.print(Pan_Angle); Serial2.print(" \t Tilt:"); Serial2.println(Tilt_Angle);
@@ -69,18 +75,19 @@ void RTC_Setup_Timer(long Period){
 * this interrupt will heald in every 1 sec
 */
 void RTC_INT(void) { 
+  noInterrupts();
   DCM_Loop_Hz=DCM_Loop_Cnt; DCM_Loop_Cnt=0;
   WEL_Loop_Hz=WEL_Loop_Cnt; WEL_Loop_Cnt=0;  
   RSL_Loop_Hz=RSL_Loop_Cnt; RSL_Loop_Cnt=0;
-  
+  interrupts(); 
   //if(Debug_Mode){
   //   RTOS_Error_Log("RTC Clock:",millis());
   //}
   
-  Serial2.print("AUT_UofM:>");
-  Serial2.print("\t DCM=");Serial2.print(DCM_Loop_Hz); Serial2.print("Hz");
-  Serial2.print("\t WEL=");Serial2.print(WEL_Loop_Hz); Serial2.print("Hz");
-  Serial2.print("\t RSL=");Serial2.print(RSL_Loop_Hz); Serial2.println("Hz");
+  //Serial2.print("AUT_UofM:>");
+  //Serial2.print("\t DCM=");Serial2.print(DCM_Loop_Hz); Serial2.print("Hz");
+  //Serial2.print("\t WEL=");Serial2.print(WEL_Loop_Hz); Serial2.print("Hz");
+  //Serial2.print("\t RSL=");Serial2.print(RSL_Loop_Hz); Serial2.println("Hz");
 }
 
 /*
@@ -159,7 +166,8 @@ void Send_Euler_State(){
    PData[1]=(byte)254;
    PData[2]=(byte)100;
    
-   unsigned long T =(unsigned long)((MPU_X+Pi) * 1000);         
+   unsigned long T =0;
+   T = (unsigned long)((MPU_X+Pi) * 1000);         
    PData[3]= _LOBYTE(T);
    PData[4]= _HIBYTE(T);
       
@@ -170,10 +178,10 @@ void Send_Euler_State(){
    T =(unsigned long)((MPU_Z+Pi)*1000); 
    PData[7]= _LOBYTE(T);
    PData[8]= _HIBYTE(T);
-    
-   for(byte i=0;i<=8;i++){
-      noInterrupts();
-      SerialUSB.print((char)PData[i]);
-      interrupts();
+   
+   noInterrupts(); 
+   for(byte i=0;i<=8;i++){  
+      SerialUSB.print((char)PData[i]);  
    } 
+   interrupts();
 }

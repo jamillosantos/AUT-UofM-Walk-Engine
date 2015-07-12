@@ -32,7 +32,7 @@ void vWalk_Engine_Task( void *pvParameters ){
        //start gait
        WEP[P_Left_Leg_Y_Offset]=-50;
        WEP[P_Right_Leg_Y_Offset]=50;
-       Stand_Init_T(1.0,2);
+       Stand_Init_T(1.0,3);  // last one was 2
        Set_Walk_Engine_Parameters((byte)Teen_Size_Robot_Num);
        Omni_Gait(WEP[Vx_Offset],WEP[Vy_Offset],WEP[Vt_Offset]); //execute omni-directional start gait
        
@@ -74,7 +74,7 @@ void vWalk_Engine_Task( void *pvParameters ){
                  Internal_Motion_Request=No_Motion;
                  Motion_Stand_Up_Front((byte)Teen_Size_Robot_Num);
                  Check_Robot_Fall=1;
-                 Stand_Init_T(1.0, 100);
+                 Stand_Init_T(1.0, 50);
                  break;
             case (byte)Stand_Up_Back:
                  //run stand up 
@@ -84,7 +84,7 @@ void vWalk_Engine_Task( void *pvParameters ){
                  Internal_Motion_Request=No_Motion;
                  Motion_Stand_Up_Back((byte)Teen_Size_Robot_Num);
                  Check_Robot_Fall=1;
-                 Stand_Init_T(1.0, 100);              
+                 Stand_Init_T(1.0, 50);              
                  break;
       }
       
