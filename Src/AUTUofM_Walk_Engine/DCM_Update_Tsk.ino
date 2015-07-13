@@ -128,6 +128,28 @@ void vDCM_Update_Task( void *pvParameters ){
     DCM_Loop_Cnt++;
     if(DCM_Loop_Cnt>=50) DCM_Loop_Cnt=0;
     
+    if(SerialUSB.available()==7){
+      byte buffer[7];
+      SerialUSB.read(buffer,7);
+      vTaskSuspendAll();
+      digitalWrite(BOARD_LED_PIN,LOW);
+      if(buffer[0]==254){
+                //walk data update
+                Vx = (double) ((((byte)buffer[1])-100) / 100.0);
+                Vy = (double) ((((byte)buffer[2])-100) / 100.0);
+                Vt = (double) ((((byte)buffer[3])-100) / 100.0);
+                
+                Motion_Ins = (Internal_Motion_Request==No_Motion ) ? buffer[4] : No_Motion;
+                                
+                if (Internal_Motion_Request==No_Motion ){
+                  Set_Head((double)((((byte)buffer[5]-100)*Pi)/100.0),(double)((((byte)buffer[6]-100)*Pi)/100.0),WEP[P_Head_Pan_Speed],WEP[P_Head_Tilt_Speed]);
+                }
+      }
+      digitalWrite(BOARD_LED_PIN,HIGH);
+      xTaskResumeAll();
+    }
+    
+    
     Calculate_Euler_Angles();
     
     if(DCM_Loop_Cnt==1){

@@ -61,7 +61,7 @@ double Head_Tilt_Speed=10;
 void setup() {
   //initialize usb as a serial port
   SerialUSB.begin();                // Config serialUSB port
-  SerialUSB.attachInterrupt(UsbInterrupt);
+  //SerialUSB.attachInterrupt(UsbInterrupt);
   
   //initialize Dynamixel defult bus (1000000bps) 5=3000000
   Dxl.begin(Boudrate_1000000bps);

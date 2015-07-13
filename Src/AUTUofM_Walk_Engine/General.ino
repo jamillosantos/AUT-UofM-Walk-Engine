@@ -148,9 +148,12 @@ void Send_Euler_State(){
    PData[6]= _LOBYTE(T);
    PData[7]= _HIBYTE(T);
    
-   noInterrupts(); 
-   for(byte i=0;i<=7;i++){  
-      SerialUSB.print((char)PData[i]);  
-   } 
-   interrupts();
+   SerialUSB.write(PData,8);
+   
+   //noInterrupts(); 
+   //for(byte i=0;i<=7;i++){  
+   //   SerialUSB.print((char)PData[i]);  
+   //} 
+   //interrupts();
+   
 }
