@@ -29,6 +29,20 @@
 #define MPU_GY80_SCL_Pin             6
 #define MPU_GY80_SDA_Pin             5
 
+
+//define instraction for communicate with PC...
+#define Ins_Set_Walk                 201  
+#define Ins_Set_Head_Joints          202  
+#define Ins_Get_Euler_States         203  
+
+#define Ins_Set_Parameter            204  
+#define Ins_Get_Parameter            205  
+
+#define No_Request                   0
+#define Request_Euler_State          1
+#define Request_Parameter            2
+
+
 //global array for set joint angle
 double Angle[NUM_OF_DXL];
 double Speed[NUM_OF_DXL];
@@ -42,6 +56,8 @@ byte   D_STATUS_LED[NUM_OF_DXL];
 byte   id[NUM_OF_DXL];              //this is not global 
 int    D_GOAL_POSITION[NUM_OF_DXL]; //this is not global 
 int    D_MOVING_SPEED[NUM_OF_DXL];  //this is also!
+
+unsigned long int DCM_Loop_Cnt=0;
 
 //address registers for dynamixel
 #define P_TORQUE_ENABLE       24
@@ -58,64 +74,56 @@ int Joints_Direction[NUM_OF_DXL];
 
 //main task for dynamixel update
 void vDCM_Update_Task( void *pvParameters ){ 
-  
+    
   //vTaskSuspendAll();
-  //Serial2.println("AUT_UofM:> Dynamixel Update Task Start Sucssecfully!");
+  //Dxl.writeByte(BROADCAST_ID,P_Return_Delay_Time,0);
   //xTaskResumeAll();
   
-  vTaskSuspendAll();
-  Dxl.writeByte(BROADCAST_ID,P_Return_Delay_Time,0);
-  xTaskResumeAll();
-  
   portTickType xLastWakeTime;
-  const portTickType xFrequency = 30;  //10ms for each loop run time means 100Hz of task frequency
+  const portTickType xFrequency = 25;  //10ms for each loop run time means 100Hz of task frequency
   xLastWakeTime = xTaskGetTickCount ();
   
   vTaskSuspendAll();
-  //Serial2.print("AUT_UofM:> Configure Robot Walk Engine...");
-  DXL_Check(); //check for all dynamixel exist
+  //DXL_Check(); //check for all dynamixel exist
   Init_Dxls_First_Time();
-  //Serial2.print("AUT_UofM:> OK!");
   xTaskResumeAll();
   
   vTaskSuspendAll();
-  //Serial2.print("AUT_UofM:> Initialize I2C MPU...");
   //initialize GY80 power pins
   pinMode(MPU_GY80_VCC_Pin, OUTPUT); digitalWrite(MPU_GY80_VCC_Pin, HIGH);  //gnd of mpu-GY80
   pinMode(MPU_GY80_GND_Pin, OUTPUT); digitalWrite(MPU_GY80_GND_Pin, LOW);   //vcc of mpu-GY80 
   delay(10);
   //Initialize i2c comunication port (sda and scl)
   Wire.begin(MPU_GY80_SDA_Pin,MPU_GY80_SCL_Pin); 
-  vTaskDelay(10);
-  //Serial2.println("OK!");
+  delay(10);
   
-  //Serial2.print("AUT_UofM:> Configuration MPU-9150...");
+  //Configuration MPU-9150...
   MPU.init(); //initialize MPU
   MPU.initDrift(20); //calculate drrift
-  //Serial2.println("OK!");
-  xTaskResumeAll();
   
-  vTaskSuspendAll();
-  //Serial2.print("AUT_UofM:> Kalman Filter Initialize...");
+  //Kalman Filter Initialize...
   kalmanX.setAngle(0.0); // Set starting angle
   kalmanY.setAngle(0.0);
-  kalmanZ.setAngle(0.0);
+  //kalmanZ.setAngle(0.0);
   kalmanX.setRmeasure(WEP[P_Kalman_Roll_RM_Rate]);
   kalmanY.setRmeasure(WEP[P_Kalman_Pitch_RM_Rate]);
-  kalmanZ.setRmeasure(WEP[P_Kalman_Yaw_RM_Rate]);
-  //Serial2.println("OK!");
+  //kalmanZ.setRmeasure(WEP[P_Kalman_Yaw_RM_Rate]);
+  
   xTaskResumeAll();
+  vTaskDelay(1500);
+  Check_Robot_Fall=1;
   
-  vTaskDelay(2500);
-  
+  //vTaskSuspendAll();
+  for(int i=0;i<=100;i++){    
+      Calculate_Euler_Angles();
+      vTaskDelay(10);
+  }
+  //xTaskResumeAll();
   
   //main task loop
   for( ;; ){
     DCM_Loop_Cnt++;
-    
-    //if(Debug_Mode){
-    //  RTOS_Error_Log("DXL Task:",DXL_Loop_Cnt);
-    //}
+    if(DCM_Loop_Cnt>=50) DCM_Loop_Cnt=0;
     
     Calculate_Euler_Angles();
     
@@ -125,6 +133,77 @@ void vDCM_Update_Task( void *pvParameters ){
       xTaskResumeAll();
     }
     
+    if((DCM_Loop_Cnt%5)==0){
+      vTaskSuspendAll();
+      Send_Euler_State();
+      xTaskResumeAll();
+    }
+    
+    //check for voltage and error if..
+    if(System_Voltage<=(int)(WEP[P_Min_Voltage_Limit]+2)){
+      togglePin(Buzzer_Pin);
+      //Serial2.println("AUT_UofM:> LOW Woltage! ERROR... v="); Serial2.println(System_Voltage);
+    }
+    else{
+      digitalWrite(Buzzer_Pin, LOW);
+    }
+    
+    //get robot state for fall
+    Robot_State();
+     
+    //check for robot fall state
+    if(Check_Robot_Fall==1){
+      if ((Internal_Motion_Request!=No_Motion ) && (Internal_Motion_Request!=Stop_Motion)) {
+        Actuators_Update=0;
+        switch (Internal_Motion_Request){
+          case Stand_Up_Front:
+            Set_Head(0,-0.6,1023,1023);
+            break;
+          case Stand_Up_Back:
+            Set_Head(0,0.5,1023,1023);
+            break;
+        }
+      }
+      else{
+        Actuators_Update=1;
+      }
+    }
+    
+    /*
+    double Acc=0;
+    double Last_Acc=0;
+    double Last_Vx=0;
+  
+    //push recovery
+    Last_Acc=Acc;
+    Acc=(0.9 * Acc)+(0.1 * MPU.get_Az());
+      
+    if (abs(Last_Acc-Acc)>0.15){
+      Last_Vx=Vx;
+      Vx=((Last_Acc-Acc)*1);
+      vTaskDelay(500);
+      Vx=Last_Vx;
+    }
+    */
+    
+    //
+    if(digitalRead(11) == 1){
+      Internal_Motion_Request=Stop_Motion;
+    }
+    else{
+      Internal_Motion_Request=No_Motion;  //release the robot stop
+    }
+    
+      
+    //run motion if key pressed
+    if(digitalRead(BUTTON1_485EXP) == 1){
+      Motion_Ins=Motion_1;   
+    }
+    
+    //if(digitalRead(BUTTON2_485EXP) == 1){
+    //  
+    //}
+      
     if(DCM_Loop_Cnt==1){
       vTaskSuspendAll();
       Dxl.writeByte(BROADCAST_ID,P_P_Gain,32);

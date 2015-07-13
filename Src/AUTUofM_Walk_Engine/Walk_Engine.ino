@@ -1,18 +1,14 @@
 //Walk_Engine Main Task
 void vWalk_Engine_Task( void *pvParameters ){
-  
-  //vTaskSuspendAll();
-  //Serial2.println("AUT_UofM:> Walk Engine Task Start Sucssecfully!");
-  //xTaskResumeAll(); 
+  Check_Robot_Fall=0;
   
   vTaskSuspendAll();
-  //Serial2.print("AUT_UofM:> Configure Robot Walk Engine...");  
+  //Configure Robot Walk Engine... 
   Init_Robot_First();
-  Vx=0.0;     //velocity of X (forward) direction from PC (min -1 to max 1)
+  Vx=0.4;        //velocity of X (forward) direction from PC (min -1 to max 1)
   Vy=0.0;        //velocity of Y (sideward) direction
   Vt=0.0;        //velocity of T (rotate) speed (per radian)  
   Buzzer(200);
-  //Serial2.println("AUT_UofM:> DONE!");
   xTaskResumeAll();
   
   //stand for first time
@@ -20,7 +16,6 @@ void vWalk_Engine_Task( void *pvParameters ){
 
   //get robot state
   Robot_State();
-  
   //main task loop
   for( ;; ){ 
     togglePin(RED_LED_485EXP);
@@ -35,7 +30,6 @@ void vWalk_Engine_Task( void *pvParameters ){
        
        //main gait
        while((((Vx!=0) ||(Vy!=0)||(Vt!=0)) && (Motion_Ins==No_Motion) && (Internal_Motion_Request==No_Motion )) && (System_Voltage>=(int)WEP[P_Min_Voltage_Limit])){
-         //Robot_State();
          Omni_Gait(Vx+WEP[Vx_Offset],Vy+WEP[Vy_Offset],Vt+WEP[Vt_Offset]); //execute omni-directional gait 
          togglePin(RED_LED_485EXP);
        }
@@ -44,11 +38,6 @@ void vWalk_Engine_Task( void *pvParameters ){
        Omni_Gait(WEP[Vx_Offset],WEP[Vy_Offset],WEP[Vt_Offset]); //execute omni-directional end gait
     }
     else{
-      WEL_Loop_Cnt++;
-      
-      //if(Debug_Mode){
-      //  RTOS_Error_Log("WEL Task:",WEL_Loop_Cnt);
-      //}
     
       //firts run gait generation with vx=vy=vt=0 for semi gait generation to stand position
       if (Internal_Motion_Request==No_Motion ){
@@ -56,7 +45,7 @@ void vWalk_Engine_Task( void *pvParameters ){
       }
       
       if (Internal_Motion_Request==Stop_Motion ){
-        Stand_Init(0.1);
+        Stand_Init(0.05);
       }
       
       vTaskDelay(30);
@@ -152,11 +141,6 @@ void Omni_Gait(double vx, double vy, double vt){
   
   //gait generate with for loop form  0~3.14
   for(double t=0; t<=TwoPi ;t+=WEP[P_Motion_Resolution]){ 
-    WEL_Loop_Cnt++;
-    
-    //if(Debug_Mode){
-    //    RTOS_Error_Log("WEL Task:",WEL_Loop_Cnt);
-    //}
    
     if (Vx >  0.5)  Vx=  0.5;
     if (Vx < -0.5)  Vx= -0.5;
@@ -176,7 +160,6 @@ void Omni_Gait(double vx, double vy, double vt){
         vTaskDelay(WEP[P_Single_Support_Sleep]);
     }
     
-    //noInterrupts(); 
     //right leg initialize
     //if t<pi the right leg in fly state and other wise in support state
     R_Leg_Ik[I_X]     = (-(cos(t)*(vx*100.0)))+ (vx * WEP[P_Body_X_Swing_Gain] * 100.0); 
@@ -195,7 +178,6 @@ void Omni_Gait(double vx, double vy, double vt){
     L_Leg_Ik[I_Roll]  = (t>=Pi) ? (sin(t)*(WEP[P_Fly_Roll_Gain])) : (sin(t)*(WEP[P_Support_Roll_Gain])); 
     L_Leg_Ik[I_Pitch] = (t>=Pi) ? 0.0 : (sin(t-Pi)*WEP[P_Support_Pitch_Gain]);
     L_Leg_Ik[I_Yaw]   = (cos(t-Pi)*(vt)); //(cos(t-Pi)*(vt));
-    //interrupts();
     
     //right arm initialize
     R_Arm[I_A_Pitch]   = ((cos(t)) * vx * 1.3); // + Arm_Hopping_Val; // + ((MPU_X+Get_E_Param(Addr_IMU_X_Angle_Offset)) * Get_E_Param(Addr_Stablizer_Arm_Pitch_Gain)*2);

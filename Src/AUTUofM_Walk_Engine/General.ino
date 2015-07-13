@@ -10,10 +10,7 @@ void UsbInterrupt(byte* buffer, byte nCount){
                 Vt = (double) ((((byte)buffer[3])-100) / 100.0);
                 
                 Motion_Ins = (Internal_Motion_Request==No_Motion ) ? buffer[4] : No_Motion;
-                
-                //Pan_Angle = (double)((((byte)buffer[6]-100)*Pi)/100.0);
-                //Tilt_Angle= (double)((((byte)buffer[7]-100)*Pi)/100.0);
-                
+                                
                 if (Internal_Motion_Request==No_Motion ){
                   Set_Head((double)((((byte)buffer[5]-100)*Pi)/100.0),(double)((((byte)buffer[6]-100)*Pi)/100.0),WEP[P_Head_Pan_Speed],WEP[P_Head_Tilt_Speed]);
                 }
@@ -23,67 +20,6 @@ void UsbInterrupt(byte* buffer, byte nCount){
   xTaskResumeAll();
   interrupts();  
 }
-
-/*
-void UsbInterrupt(byte* buffer, byte nCount){
-  //vTaskSuspendAll();
-  noInterrupts();
-  vTaskSuspendAll();
-  if(nCount==13){
-    digitalWrite(BOARD_LED_PIN,LOW);
-    //if(Debug_Mode){
-    //  RTOS_Error_Log("USB Int:",nCount);
-    //}
-    if((buffer[0]==254) && (buffer[1]==254)){
-                //walk data update
-                unsigned long T=0;
-                T =((unsigned long) ((unsigned long)(buffer[3]<<8) + ((byte)buffer[2])));
-                double tVx=0.0;
-                tVx =(T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
-                if((tVx>-1.0) && (tVx<1.0)){
-                  Vx=tVx; 
-                }
-                
-                T =((unsigned long) ((unsigned long)(buffer[5]<<8) + ((byte)buffer[4])));
-                double tVy=0.0;
-                tVy = (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
-                if((tVy>-1.0) && (tVy<1.0)){
-                  Vy=tVy;
-                }
-                      
-                T =((unsigned long) ((unsigned long)(buffer[7]<<8) + ((byte)buffer[6])));
-                double tVt=0.0;
-                tVt = (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
-                if((tVt>-1.0) && (tVt<1.0)){
-                  Vt=tVt;
-                }
-                
-                if (Internal_Motion_Request==No_Motion ){
-                  Motion_Ins=buffer[8];
-                }
-                    
-                //head data update
-                T =((unsigned long) ((unsigned long)(buffer[10] << 8) + ((byte)buffer[9])));
-                double Pan_Angle=0.0;
-                Pan_Angle = (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));       
-                
-                T =((unsigned long) ((unsigned long)(buffer[12] << 8) + ((byte)buffer[11])));
-                double Tilt_Angle=0.0;
-                Tilt_Angle = (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
-                
-                if (Internal_Motion_Request==No_Motion ){
-                  //Serial2.print("AUT_UofM:> Head Pan:"); Serial2.print(Pan_Angle); Serial2.print(" \t Tilt:"); Serial2.println(Tilt_Angle);
-                  Set_Head(Pan_Angle,Tilt_Angle,WEP[P_Head_Pan_Speed],WEP[P_Head_Tilt_Speed]);
-                }
-    }
-    //xTaskResumeAll();
-    digitalWrite(BOARD_LED_PIN,HIGH);
-  }
-  xTaskResumeAll();
-  interrupts();  
-  //xTaskResumeAll();
-}
-*/
 
 /*
 * real time clock initialize
@@ -104,9 +40,9 @@ void RTC_Setup_Timer(long Period){
 */
 void RTC_INT(void) { 
   //noInterrupts();
-  DCM_Loop_Hz=DCM_Loop_Cnt; DCM_Loop_Cnt=0;
-  WEL_Loop_Hz=WEL_Loop_Cnt; WEL_Loop_Cnt=0;  
-  RSL_Loop_Hz=RSL_Loop_Cnt; RSL_Loop_Cnt=0;
+  //DCM_Loop_Hz=DCM_Loop_Cnt; DCM_Loop_Cnt=0;
+  //WEL_Loop_Hz=WEL_Loop_Cnt; WEL_Loop_Cnt=0;  
+  //RSL_Loop_Hz=RSL_Loop_Cnt; RSL_Loop_Cnt=0;
   //interrupts(); 
   //if(Debug_Mode){
   //   RTOS_Error_Log("RTC Clock:",millis());
@@ -126,8 +62,8 @@ void Initialize_Expander_Pins(){
   pinMode(GREEN_LED_485EXP, OUTPUT); 
   pinMode(BLUE_LED_485EXP , OUTPUT); 
   
-  pinMode(BUTTON1_485EXP, INPUT); 
-  pinMode(BUTTON2_485EXP, INPUT);
+  pinMode(BUTTON1_485EXP  , INPUT); 
+  pinMode(BUTTON2_485EXP  , INPUT);
   
   digitalWrite(RED_LED_485EXP  , HIGH);
   digitalWrite(GREEN_LED_485EXP, HIGH);
@@ -169,6 +105,7 @@ void RTOS_Error_Log(char * P, int i){
 }
 */
 
+/*
 //calculate the polynomilan function
 double Poly_Calculate(double x, double* coefficients, int degree)
 {
@@ -182,7 +119,7 @@ double Poly_Calculate(double x, double* coefficients, int degree)
     }
     return y;
 }
-
+*/
 
 
 /* 
@@ -194,23 +131,22 @@ void Send_Euler_State(){
    
    PData[0]=(byte)254;
    PData[1]=(byte)254;
-   PData[2]=(byte)100;
    
    unsigned long T =0;
    T = (unsigned long)((MPU_X+Pi) * 1000);         
-   PData[3]= _LOBYTE(T);
-   PData[4]= _HIBYTE(T);
+   PData[2]= _LOBYTE(T);
+   PData[3]= _HIBYTE(T);
       
    T =(unsigned long)((MPU_Y+Pi)*1000); 
-   PData[5]= _LOBYTE(T);
-   PData[6]= _HIBYTE(T);
+   PData[4]= _LOBYTE(T);
+   PData[5]= _HIBYTE(T);
    
    T =(unsigned long)((MPU_Z+Pi)*1000); 
-   PData[7]= _LOBYTE(T);
-   PData[8]= _HIBYTE(T);
+   PData[6]= _LOBYTE(T);
+   PData[7]= _HIBYTE(T);
    
    noInterrupts(); 
-   for(byte i=0;i<=8;i++){  
+   for(byte i=0;i<=7;i++){  
       SerialUSB.print((char)PData[i]);  
    } 
    interrupts();

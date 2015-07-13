@@ -66,7 +66,6 @@ void Update_Ik(double _R_Leg_Speed, double _L_Leg_Speed, double _R_Leg_Ik[], dou
   if (Angle[Id_Left_Arm_Roll]<-1.5) Angle[Id_Left_Arm_Roll]=-1.5;
   Angle[Id_Left_Arm_Elbow]= _L_Arm[I_A_Elbow] + WEP[P_L_Arm_Elbow_offset];
 
-
   //set right leg speeds
   Speed[Id_Right_Hip_Yaw]    = _R_Leg_Speed;
   Speed[Id_Right_Hip_Roll]   = _R_Leg_Speed;

@@ -9,8 +9,8 @@
 //#include "stdio.h"
 
 // Ten Size Akbar=0  Asghar=1
-//#define Teen_Size_Robot_Num   (0)  //AK
-#define Teen_Size_Robot_Num     (1) //AS
+#define Teen_Size_Robot_Num   (0)  //AK
+//#define Teen_Size_Robot_Num     (1) //AS
 
 #define Debug_Mode              (0)
 
@@ -48,11 +48,11 @@ Dynamixel Dxl(DXL_BUS_SERIAL3);            // Dynamixel on Serial1(USART1)
 //creat kalman objects
 KalmanFilter2D kalmanX; // Create the Kalman instances
 KalmanFilter2D kalmanY;
-KalmanFilter2D kalmanZ;
+//KalmanFilter2D kalmanZ;
 
-unsigned long int DCM_Loop_Hz=0 , DCM_Loop_Cnt=0;
-unsigned long int WEL_Loop_Hz=0 , WEL_Loop_Cnt=0;
-unsigned long int RSL_Loop_Hz=0 , RSL_Loop_Cnt=0;
+//unsigned long int DCM_Loop_Hz=0 , 
+//unsigned long int WEL_Loop_Hz=0 , WEL_Loop_Cnt=0;
+//unsigned long int RSL_Loop_Hz=0 , RSL_Loop_Cnt=0;
 
 double MPU_X=0, MPU_Y=0, MPU_Z=0;
 double Gyro_X=0, Gyro_Y=0;
@@ -96,11 +96,11 @@ void setup() {
   //}
   
     //initialize internal timer
-  RTC_Setup_Timer(1000000);         //initialize RTC for 1 mili secound
+  //RTC_Setup_Timer(1000000);         //initialize RTC for 1 mili secound
   
   xTaskCreate( vWalk_Engine_Task,      ( signed char * ) "Walk_Engine_Task"       , 512, NULL, 10, NULL );
-  xTaskCreate( vDCM_Update_Task,       ( signed char * ) "DCM_Update_Task"        , 512, NULL, 1, NULL );
-  xTaskCreate( vRobot_State_Task,      ( signed char * ) "Robot_State"            , 256, NULL, 1, NULL );
+  xTaskCreate( vDCM_Update_Task,       ( signed char * ) "DCM_Update_Task"        , 512., NULL, 1, NULL );
+  //xTaskCreate( vRobot_State_Task,      ( signed char * ) "Robot_State"            , 256, NULL, 1, NULL );
 
   vTaskStartScheduler();
 }

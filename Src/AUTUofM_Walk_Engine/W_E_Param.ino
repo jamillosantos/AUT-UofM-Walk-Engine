@@ -35,7 +35,7 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_Support_X_Swing_Gain]=0;           
     WEP[P_Support_Y_Swing_Gain]=0;            
     WEP[P_Support_Z_Swing_Gain]=0.0;              
-    WEP[P_Body_X_Swing_Gain]=50;                   
+    WEP[P_Body_X_Swing_Gain]=0;                   
     WEP[P_Body_Y_Swing_Gain]=0.15; //0.04                 
     WEP[P_Body_Z_Swing_Gain]=0;                   
 
@@ -82,7 +82,7 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_Left_Leg_Foot_Pitch_Offset]=0;         
     WEP[P_Left_Leg_Foot_Roll_Offset]=0;           
 
-    WEP[P_Right_Leg_Hip_Yaw_Offset]=0;          
+    WEP[P_Right_Leg_Hip_Yaw_Offset]=-0.15;          
     WEP[P_Right_Leg_Hip_Roll_Offset]=0;          
     WEP[P_Right_Leg_Hip_Pitch_Offset]=0.1;         
     WEP[P_Right_Leg_Knee_Offset]=0;             
@@ -121,7 +121,7 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_Gyro_Y_LowPass_Gain]=0.7;             
     
     //kalman filter r mesurement value
-    WEP[P_Kalman_Roll_RM_Rate]=500;               
+    WEP[P_Kalman_Roll_RM_Rate]=150;               
     WEP[P_Kalman_Pitch_RM_Rate]=200;             
     WEP[P_Kalman_Yaw_RM_Rate]=50;                
     
