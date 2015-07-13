@@ -174,14 +174,14 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_Fly_X_Swing_Gain]=0;                  
     WEP[P_Fly_Y_Swing_Gain]=0.05;                  
     WEP[P_Fly_Z_Swing_Gain]=0.7;                   
-    WEP[P_Support_Roll_Gain]=0.1;               
+    WEP[P_Support_Roll_Gain]=0.12;               
     WEP[P_Support_Pitch_Gain]=0;                
     WEP[P_Support_Yaw_Gain]=0;               
     WEP[P_Support_X_Swing_Gain]=0;           
     WEP[P_Support_Y_Swing_Gain]=0;            
     WEP[P_Support_Z_Swing_Gain]=0.0;              
     WEP[P_Body_X_Swing_Gain]=0;                   
-    WEP[P_Body_Y_Swing_Gain]=0.2; //0.15                
+    WEP[P_Body_Y_Swing_Gain]=0.15; //0.15                
     WEP[P_Body_Z_Swing_Gain]=0;                  
 
     //stablization parameters

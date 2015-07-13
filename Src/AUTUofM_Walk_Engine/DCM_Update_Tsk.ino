@@ -121,7 +121,7 @@ void vDCM_Update_Task( void *pvParameters ){
     vTaskDelay(20);
   }
     
-  Check_Robot_Fall=0;
+  Check_Robot_Fall=1;
   
   //main task loop
   for( ;; ){
