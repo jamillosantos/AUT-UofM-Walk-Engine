@@ -36,9 +36,10 @@ void vRobot_State_Task( void *pvParameters ){
     //  RTOS_Error_Log("RST Task:",RSL_Loop_Cnt);
     //}
     
-    vTaskSuspendAll();
-    Send_Euler_State();
-    xTaskResumeAll();
+    //vTaskSuspendAll();
+    //Send_Euler_State_SerialUSB();
+    //Send_Euler_State_Serial2();
+    //xTaskResumeAll();
     
     //run motion if key pressed
     if(digitalRead(BUTTON1_485EXP) == 1){

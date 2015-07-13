@@ -75,11 +75,10 @@ double Head_Tilt_Speed=10;
 
 void setup() {
   //initialize usb as a serial port
-  SerialUSB.begin();                // Config serialUSB port
+  //SerialUSB.begin();                // Config serialUSB port
   SerialUSB.attachInterrupt(UsbInterrupt);
   
-  //Serial2 Serial initialize
-  //Serial2.begin(2000000); 
+    //Serial2 Serial initialize
   
   //initialize Dynamixel defult bus (1000000bps) 5=3000000
   Dxl.begin(Boudrate_1000000bps);
@@ -98,9 +97,12 @@ void setup() {
     //initialize internal timer
   RTC_Setup_Timer(1000000);         //initialize RTC for 1 mili secound
   
-  xTaskCreate( vWalk_Engine_Task,      ( signed char * ) "Walk_Engine_Task"       , 512, NULL, 10, NULL );
-  xTaskCreate( vRobot_State_Task,      ( signed char * ) "Robot_State"            , 512, NULL, 1, NULL );
-  xTaskCreate( vDCM_Update_Task,       ( signed char * ) "DCM_Update_Task"        , 512, NULL, 1, NULL );
+  //Serial2.begin(1000000); 
+  //Serial2.attachInterrupt(serial2Interrupt);
+  
+  xTaskCreate( vWalk_Engine_Task,      ( signed char * ) "Walk_Engine_Task"       , 256, NULL, 10, NULL );
+  xTaskCreate( vRobot_State_Task,      ( signed char * ) "Robot_State"            , 256, NULL, 1, NULL );
+  xTaskCreate( vDCM_Update_Task,       ( signed char * ) "DCM_Update_Task"        , 256, NULL, 1, NULL );
 
   vTaskStartScheduler();
 }

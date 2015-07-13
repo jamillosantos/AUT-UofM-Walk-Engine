@@ -73,7 +73,7 @@ void vDCM_Update_Task( void *pvParameters ){
   
   vTaskSuspendAll();
   //Serial2.print("AUT_UofM:> Configure Robot Walk Engine...");
-  DXL_Check(); //check for all dynamixel exist
+  //DXL_Check(); //check for all dynamixel exist
   Init_Dxls_First_Time();
   //Serial2.print("AUT_UofM:> OK!");
   xTaskResumeAll();
@@ -82,8 +82,9 @@ void vDCM_Update_Task( void *pvParameters ){
   //Serial2.print("AUT_UofM:> Initialize I2C MPU...");
   //initialize GY80 power pins
   pinMode(MPU_GY80_VCC_Pin, OUTPUT); digitalWrite(MPU_GY80_VCC_Pin, HIGH);  //gnd of mpu-GY80
-  pinMode(MPU_GY80_GND_Pin, OUTPUT); digitalWrite(MPU_GY80_GND_Pin, LOW);   //vcc of mpu-GY80 
-  delay(10);
+  pinMode(MPU_GY80_GND_Pin, OUTPUT); digitalWrite(MPU_GY80_GND_Pin, LOW);   //vcc of mpu-GY80
+  
+  vTaskDelay(10);
   //Initialize i2c comunication port (sda and scl)
   Wire.begin(MPU_GY80_SDA_Pin,MPU_GY80_SCL_Pin); 
   vTaskDelay(10);
@@ -260,7 +261,6 @@ void Init_Dxls_First_Time(){
 }
 
 void DXL_Check(){
-  /*
   int model;
   Serial2.println(" ");
   Serial2.println("AUT_UofM:> Check DXL Exist...");
@@ -299,7 +299,6 @@ void DXL_Check(){
     }
   }
   Serial2.println("AUT_UofM:> Check DXL DONE!");
-  */
 }
 
 double dt=0 , PrevTime=0;

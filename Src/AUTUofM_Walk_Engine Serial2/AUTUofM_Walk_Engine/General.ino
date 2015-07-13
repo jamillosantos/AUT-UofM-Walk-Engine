@@ -1,3 +1,92 @@
+byte state=0;
+byte dlen=0;
+byte dbuffer[12];
+
+void serial2Interrupt(byte dddData){
+  SerialUSB.println(dddData);
+  /*
+  noInterrupts();
+  vTaskSuspendAll();
+  
+  byte finish_pocket=0;
+  
+  switch (state){
+    case 0:{
+      state=0;
+      if(buffer==(byte)254) {
+        state=1;
+        SerialUSB.println("OK first 254");
+      }
+    }
+    break;
+    case 1:{
+      state=0;
+      if(buffer==(byte)254){
+        state=2;
+        dlen=0;
+      }
+    }
+    break;
+    case 2:{
+      dbuffer[dlen]=(byte)buffer;
+      dlen++;
+      if(dlen>=10){
+        finish_pocket==1;
+        state=0;
+        dlen=0;
+      }
+    }
+    break;
+  }
+  
+  if(finish_pocket==1)
+  {
+                //walk data update
+                unsigned long T=0;
+                T =((unsigned long) ((unsigned long)(dbuffer[1]<<8) + ((byte)dbuffer[0])));
+                double tVx=0.0;
+                tVx =(T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
+                if((tVx>-1.0) && (tVx<1.0)){
+                  Vx=tVx; 
+                }
+                
+                T =((unsigned long) ((unsigned long)(dbuffer[3]<<8) + ((byte)dbuffer[2])));
+                double tVy=0.0;
+                tVy = (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
+                if((tVy>-1.0) && (tVy<1.0)){
+                  Vy=tVy;
+                }
+                      
+                T =((unsigned long) ((unsigned long)(dbuffer[5]<<8) + ((byte)dbuffer[4])));
+                double tVt=0.0;
+                tVt = (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
+                if((tVt>-1.0) && (tVt<1.0)){
+                  Vt=tVt;
+                }
+                
+                if (Internal_Motion_Request==No_Motion ){
+                  Motion_Ins=dbuffer[6];
+                }
+                    
+                //head data update
+                T =((unsigned long) ((unsigned long)(dbuffer[8] << 8) + ((byte)dbuffer[7])));
+                double Pan_Angle=0.0;
+                Pan_Angle = (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));       
+                
+                T =((unsigned long) ((unsigned long)(dbuffer[10] << 8) + ((byte)dbuffer[9])));
+                double Tilt_Angle=0.0;
+                Tilt_Angle = (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
+                
+                if (Internal_Motion_Request==No_Motion ){
+                  //Serial2.print("AUT_UofM:> Head Pan:"); Serial2.print(Pan_Angle); Serial2.print(" \t Tilt:"); Serial2.println(Tilt_Angle);
+                  Set_Head(Pan_Angle,Tilt_Angle,WEP[P_Head_Pan_Speed],WEP[P_Head_Tilt_Speed]);
+                }
+  }
+  xTaskResumeAll();
+  interrupts(); 
+  */
+}
+
 void UsbInterrupt(byte* buffer, byte nCount){
   //vTaskSuspendAll();
   noInterrupts();
@@ -160,7 +249,7 @@ double Poly_Calculate(double x, double* coefficients, int degree)
 /* 
 * send Euler state to the USB serial Port
 */
-void Send_Euler_State(){
+void Send_Euler_State_SerialUSB(){
   
    byte PData[10];
    
@@ -184,6 +273,34 @@ void Send_Euler_State(){
    noInterrupts(); 
    for(byte i=0;i<=8;i++){  
       SerialUSB.print((char)PData[i]);  
+   } 
+   interrupts();
+}
+
+void Send_Euler_State_Serial2(){
+  
+   byte PData[10];
+   
+   PData[0]=(byte)254;
+   PData[1]=(byte)254;
+   PData[2]=(byte)100;
+   
+   unsigned long T =0;
+   T = (unsigned long)((MPU_X+Pi) * 1000);         
+   PData[3]= _LOBYTE(T);
+   PData[4]= _HIBYTE(T);
+      
+   T =(unsigned long)((MPU_Y+Pi)*1000); 
+   PData[5]= _LOBYTE(T);
+   PData[6]= _HIBYTE(T);
+   
+   T =(unsigned long)((MPU_Z+Pi)*1000); 
+   PData[7]= _LOBYTE(T);
+   PData[8]= _HIBYTE(T);
+   
+   noInterrupts(); 
+   for(byte i=0;i<=8;i++){  
+      //Serial2.print((char)PData[i]);  
    } 
    interrupts();
 }
