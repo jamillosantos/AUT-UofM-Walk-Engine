@@ -1,4 +1,31 @@
 void UsbInterrupt(byte* buffer, byte nCount){
+  noInterrupts();
+  vTaskSuspendAll();
+  if(nCount==7){
+    digitalWrite(BOARD_LED_PIN,LOW);
+    if(buffer[0]==254){
+                //walk data update
+                Vx = (double) ((((byte)buffer[1])-100) / 100.0);
+                Vy = (double) ((((byte)buffer[2])-100) / 100.0);
+                Vt = (double) ((((byte)buffer[3])-100) / 100.0);
+                
+                Motion_Ins = (Internal_Motion_Request==No_Motion ) ? buffer[4] : No_Motion;
+                
+                //Pan_Angle = (double)((((byte)buffer[6]-100)*Pi)/100.0);
+                //Tilt_Angle= (double)((((byte)buffer[7]-100)*Pi)/100.0);
+                
+                if (Internal_Motion_Request==No_Motion ){
+                  Set_Head((double)((((byte)buffer[5]-100)*Pi)/100.0),(double)((((byte)buffer[6]-100)*Pi)/100.0),WEP[P_Head_Pan_Speed],WEP[P_Head_Tilt_Speed]);
+                }
+    }
+    digitalWrite(BOARD_LED_PIN,HIGH);
+  }
+  xTaskResumeAll();
+  interrupts();  
+}
+
+/*
+void UsbInterrupt(byte* buffer, byte nCount){
   //vTaskSuspendAll();
   noInterrupts();
   vTaskSuspendAll();
@@ -56,6 +83,7 @@ void UsbInterrupt(byte* buffer, byte nCount){
   interrupts();  
   //xTaskResumeAll();
 }
+*/
 
 /*
 * real time clock initialize

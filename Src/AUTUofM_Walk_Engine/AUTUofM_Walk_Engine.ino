@@ -99,8 +99,8 @@ void setup() {
   RTC_Setup_Timer(1000000);         //initialize RTC for 1 mili secound
   
   xTaskCreate( vWalk_Engine_Task,      ( signed char * ) "Walk_Engine_Task"       , 512, NULL, 10, NULL );
-  xTaskCreate( vRobot_State_Task,      ( signed char * ) "Robot_State"            , 512, NULL, 1, NULL );
   xTaskCreate( vDCM_Update_Task,       ( signed char * ) "DCM_Update_Task"        , 512, NULL, 1, NULL );
+  xTaskCreate( vRobot_State_Task,      ( signed char * ) "Robot_State"            , 256, NULL, 1, NULL );
 
   vTaskStartScheduler();
 }
