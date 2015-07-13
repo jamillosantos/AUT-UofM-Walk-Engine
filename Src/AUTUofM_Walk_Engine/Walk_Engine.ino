@@ -1,7 +1,6 @@
 //Walk_Engine Main Task
 void vWalk_Engine_Task( void *pvParameters ){
-  Check_Robot_Fall=0;
-  
+    
   vTaskSuspendAll();
   //Configure Robot Walk Engine... 
   Init_Robot_First();
@@ -11,11 +10,10 @@ void vWalk_Engine_Task( void *pvParameters ){
   Buzzer(200);
   xTaskResumeAll();
   
+  Stand_Init_T(0.05,1);
+  vTaskDelay(1000);
   //stand for first time
   Stand_Init_T(0.05,300);
-
-  //get robot state
-  Robot_State();
   
   //main task loop
   for( ;; ){ 
@@ -254,10 +252,7 @@ void Robot_State(){
 }
 
 void Init_Robot_First(){
-  
-  //Initialize walk engine parameters in first time
-  Set_Walk_Engine_Parameters((byte)Teen_Size_Robot_Num);
-  
+    
   Stand_Init(0.1);  //ititialie robot to stand position 
   
   Vx=0.0;        //velocity of X (forward) direction from PC (min -1 to max 1)

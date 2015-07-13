@@ -57,6 +57,9 @@ int Joints_Direction[NUM_OF_DXL];
 //main task for dynamixel update
 void vDCM_Update_Task( void *pvParameters ){ 
   
+  //Initialize walk engine parameters in first time
+  Set_Walk_Engine_Parameters((byte)Teen_Size_Robot_Num);
+  
   portTickType xLastWakeTime;
   const portTickType xFrequency = 25;  //10ms for each loop run time means 100Hz of task frequency
   xLastWakeTime = xTaskGetTickCount ();
@@ -67,32 +70,32 @@ void vDCM_Update_Task( void *pvParameters ){
   //initialize GY80 power pins
   pinMode(MPU_GY80_VCC_Pin, OUTPUT); digitalWrite(MPU_GY80_VCC_Pin, HIGH);  //gnd of mpu-GY80
   pinMode(MPU_GY80_GND_Pin, OUTPUT); digitalWrite(MPU_GY80_GND_Pin, LOW);   //vcc of mpu-GY80 
-  delay(10);
+  vTaskDelay(10);
   
   //Initialize i2c comunication port (sda and scl)
   Wire.begin(MPU_GY80_SDA_Pin,MPU_GY80_SCL_Pin); 
-  delay(10);
+  vTaskDelay(10);
   
   //Configuration MPU-9150...
   MPU.init(); //initialize MPU
   MPU.initDrift(20); //calculate drrift
   
-  //Kalman Filter Initialize...
-  kalmanX.setAngle(0.0); // Set starting angle
-  kalmanY.setAngle(0.0);
-
   kalmanX.setRmeasure(WEP[P_Kalman_Roll_RM_Rate]);
   kalmanY.setRmeasure(WEP[P_Kalman_Pitch_RM_Rate]);
   
   xTaskResumeAll();
   
-  vTaskDelay(1500);
-  Check_Robot_Fall=1;
+  vTaskDelay(500);
+  DXL_Write_PS();
+  vTaskDelay(500);
   
-  for(int i=0;i<=500;i++){    
-      Calculate_Euler_Angles();
-      vTaskDelay(1);
-  }
+  MPU_X=0.0;
+  MPU_Y=0.0;
+  MPU_Z=0.0;
+  
+  //Kalman Filter Initialize...
+  kalmanX.setAngle(0.0); // Set starting angle
+  kalmanY.setAngle(0.0);
   
   for(int i=0;i<=10;i++){ 
       vTaskSuspendAll();
@@ -111,7 +114,15 @@ void vDCM_Update_Task( void *pvParameters ){
       xTaskResumeAll();
       vTaskDelay(5);
   }
+  
+  for(unsigned int i=0;i<=500;i++){
+    togglePin(BLUE_LED_485EXP);
+    Calculate_Euler_Angles();
+    vTaskDelay(25);
+  }
     
+  Check_Robot_Fall=0;
+  
   //main task loop
   for( ;; ){
     DCM_Loop_Cnt++;
@@ -126,9 +137,11 @@ void vDCM_Update_Task( void *pvParameters ){
     }
     
     if((DCM_Loop_Cnt%5)==0){
+      digitalWrite(GREEN_LED_485EXP, LOW);
       vTaskSuspendAll();
       Send_Euler_State();
       xTaskResumeAll();
+      digitalWrite(GREEN_LED_485EXP, HIGH);
     }
     
     //check for voltage and error if..
@@ -157,6 +170,7 @@ void vDCM_Update_Task( void *pvParameters ){
         }
       }
       else{
+        Stand_Init(0.05);
         Actuators_Update=1;
       }
     }
@@ -208,9 +222,9 @@ void vDCM_Update_Task( void *pvParameters ){
      
     DXL_Write_Head();
     
-    digitalWrite(BLUE_LED_485EXP, HIGH); 
+    digitalWrite(BLUE_LED_485EXP, LOW); 
     vTaskDelayUntil( &xLastWakeTime, xFrequency );
-    digitalWrite(BLUE_LED_485EXP, LOW);
+    digitalWrite(BLUE_LED_485EXP, HIGH);
   }
 }
 
