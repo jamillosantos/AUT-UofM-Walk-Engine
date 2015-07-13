@@ -118,7 +118,7 @@ void vDCM_Update_Task( void *pvParameters ){
   for(unsigned int i=0;i<=500;i++){
     togglePin(BLUE_LED_485EXP);
     Calculate_Euler_Angles();
-    vTaskDelay(25);
+    vTaskDelay(20);
   }
     
   Check_Robot_Fall=0;
