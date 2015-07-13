@@ -1,0 +1,9 @@
+U:\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\bin\Debug\GUI-Test.exe.config
+U:\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\obj\Debug\GUI-Test.csprojResolveAssemblyReference.cache
+U:\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\obj\Debug\GUI_Test.Form1.resources
+U:\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\obj\Debug\GUI_Test.Properties.Resources.resources
+U:\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\obj\Debug\GUI-Test.csproj.GenerateResource.Cache
+U:\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\bin\Debug\GUI-Test.exe
+U:\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\bin\Debug\GUI-Test.pdb
+U:\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\obj\Debug\GUI-Test.exe
+U:\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\obj\Debug\GUI-Test.pdb
