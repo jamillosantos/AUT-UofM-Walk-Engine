@@ -1,18 +1,11 @@
-//#include "MQueue.h"
 #include "Wire.h"
 #include "MPUGY80.h"
 #include "KalmanFilter2D.h"
 #include "MapleFreeRTOS.h"   // RTOS Lib
-//#include "EEPROM.h"
-//#include "orpol.h"
-//#include "pplsq.h"
-//#include "stdio.h"
 
 // Ten Size Akbar=0  Asghar=1
 #define Teen_Size_Robot_Num   (0)  //AK
 //#define Teen_Size_Robot_Num     (1) //AS
-
-#define Debug_Mode              (0)
 
 //motion numbers table
 #define Motion_1                     0x01
@@ -39,26 +32,18 @@
 #define Fallen_Left                  4
 #define Normal_Stand                 5
 
-HardwareTimer Timer(1);      // Hardware timer for RTC
 MPUGY80 MPU;
 Dynamixel Dxl(DXL_BUS_SERIAL3);            // Dynamixel on Serial1(USART1)
-//EEPROM CM_EEPROM;
-//HardwareSPI spi(1);
 
 //creat kalman objects
 KalmanFilter2D kalmanX; // Create the Kalman instances
 KalmanFilter2D kalmanY;
-//KalmanFilter2D kalmanZ;
-
-//unsigned long int DCM_Loop_Hz=0 , 
-//unsigned long int WEL_Loop_Hz=0 , WEL_Loop_Cnt=0;
-//unsigned long int RSL_Loop_Hz=0 , RSL_Loop_Cnt=0;
 
 double MPU_X=0, MPU_Y=0, MPU_Z=0;
 double Gyro_X=0, Gyro_Y=0;
-double WEP[100];
 double System_Voltage=160; //defult voltage
 byte   Actuators_Update=1;
+double WEP[100];
 
 //walk engine parameters (these are sent from PC)
 //main walk parameters
@@ -78,9 +63,6 @@ void setup() {
   SerialUSB.begin();                // Config serialUSB port
   SerialUSB.attachInterrupt(UsbInterrupt);
   
-  //Serial2 Serial initialize
-  //Serial2.begin(2000000); 
-  
   //initialize Dynamixel defult bus (1000000bps) 5=3000000
   Dxl.begin(Boudrate_1000000bps);
   
@@ -89,19 +71,9 @@ void setup() {
   
   //initialize expantion board pins
   Initialize_Expander_Pins();
-  
-  //CM_EEPROM.begin();
-  //for(int j=0;j < 100;j++){
-  //  CM_EEPROM.write(j,j+2);// write i*2 to virtual address 0~9
-  //}
-  
-    //initialize internal timer
-  //RTC_Setup_Timer(1000000);         //initialize RTC for 1 mili secound
-  
+
   xTaskCreate( vWalk_Engine_Task,      ( signed char * ) "Walk_Engine_Task"       , 512, NULL, 10, NULL );
   xTaskCreate( vDCM_Update_Task,       ( signed char * ) "DCM_Update_Task"        , 512., NULL, 1, NULL );
-  //xTaskCreate( vRobot_State_Task,      ( signed char * ) "Robot_State"            , 256, NULL, 1, NULL );
-
   vTaskStartScheduler();
 }
 

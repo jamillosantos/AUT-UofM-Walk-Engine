@@ -21,9 +21,11 @@ void UsbInterrupt(byte* buffer, byte nCount){
   interrupts();  
 }
 
+
 /*
 * real time clock initialize
 */
+/*
 void RTC_Setup_Timer(long Period){
   Timer.pause();                                  // Pause the timer while we're configuring it
   Timer.setPeriod(Period);                // Set up period in microseconds
@@ -33,12 +35,13 @@ void RTC_Setup_Timer(long Period){
   Timer.refresh();                                // Refresh the timer's count, prescale, and overflow
   Timer.resume(); 
 }
+*/
 
 /*
 * Hardware interrupt for real time clock
 * this interrupt will heald in every 1 sec
 */
-void RTC_INT(void) { 
+//void RTC_INT(void) { 
   //noInterrupts();
   //DCM_Loop_Hz=DCM_Loop_Cnt; DCM_Loop_Cnt=0;
   //WEL_Loop_Hz=WEL_Loop_Cnt; WEL_Loop_Cnt=0;  
@@ -52,7 +55,7 @@ void RTC_INT(void) {
   //Serial2.print("\t DCM=");Serial2.print(DCM_Loop_Hz); Serial2.print("Hz");
   //Serial2.print("\t WEL=");Serial2.print(WEL_Loop_Hz); Serial2.print("Hz");
   //Serial2.print("\t RSL=");Serial2.print(RSL_Loop_Hz); Serial2.println("Hz");
-}
+//}
 
 /*
  initialize expantion board pins

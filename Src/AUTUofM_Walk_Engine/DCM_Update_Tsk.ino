@@ -29,29 +29,11 @@
 #define MPU_GY80_SCL_Pin             6
 #define MPU_GY80_SDA_Pin             5
 
-
-//define instraction for communicate with PC...
-#define Ins_Set_Walk                 201  
-#define Ins_Set_Head_Joints          202  
-#define Ins_Get_Euler_States         203  
-
-#define Ins_Set_Parameter            204  
-#define Ins_Get_Parameter            205  
-
-#define No_Request                   0
-#define Request_Euler_State          1
-#define Request_Parameter            2
-
-
 //global array for set joint angle
 double Angle[NUM_OF_DXL];
 double Speed[NUM_OF_DXL];
 byte   D_TORQUE_ENABLE[NUM_OF_DXL];
 byte   D_STATUS_LED[NUM_OF_DXL];
-
-//byte   D_KD_GAIN[NUM_OF_DXL];   
-//byte   D_KI_GAIN[NUM_OF_DXL];
-//byte   D_KP_GAIN[NUM_OF_DXL];
 
 byte   id[NUM_OF_DXL];              //this is not global 
 int    D_GOAL_POSITION[NUM_OF_DXL]; //this is not global 
@@ -74,25 +56,19 @@ int Joints_Direction[NUM_OF_DXL];
 
 //main task for dynamixel update
 void vDCM_Update_Task( void *pvParameters ){ 
-    
-  //vTaskSuspendAll();
-  //Dxl.writeByte(BROADCAST_ID,P_Return_Delay_Time,0);
-  //xTaskResumeAll();
   
   portTickType xLastWakeTime;
   const portTickType xFrequency = 25;  //10ms for each loop run time means 100Hz of task frequency
   xLastWakeTime = xTaskGetTickCount ();
   
   vTaskSuspendAll();
-  //DXL_Check(); //check for all dynamixel exist
   Init_Dxls_First_Time();
-  xTaskResumeAll();
   
-  vTaskSuspendAll();
   //initialize GY80 power pins
   pinMode(MPU_GY80_VCC_Pin, OUTPUT); digitalWrite(MPU_GY80_VCC_Pin, HIGH);  //gnd of mpu-GY80
   pinMode(MPU_GY80_GND_Pin, OUTPUT); digitalWrite(MPU_GY80_GND_Pin, LOW);   //vcc of mpu-GY80 
   delay(10);
+  
   //Initialize i2c comunication port (sda and scl)
   Wire.begin(MPU_GY80_SDA_Pin,MPU_GY80_SCL_Pin); 
   delay(10);
@@ -104,22 +80,38 @@ void vDCM_Update_Task( void *pvParameters ){
   //Kalman Filter Initialize...
   kalmanX.setAngle(0.0); // Set starting angle
   kalmanY.setAngle(0.0);
-  //kalmanZ.setAngle(0.0);
+
   kalmanX.setRmeasure(WEP[P_Kalman_Roll_RM_Rate]);
   kalmanY.setRmeasure(WEP[P_Kalman_Pitch_RM_Rate]);
-  //kalmanZ.setRmeasure(WEP[P_Kalman_Yaw_RM_Rate]);
   
   xTaskResumeAll();
+  
   vTaskDelay(1500);
   Check_Robot_Fall=1;
   
-  //vTaskSuspendAll();
   for(int i=0;i<=100;i++){    
       Calculate_Euler_Angles();
-      vTaskDelay(10);
+      vTaskDelay(5);
   }
-  //xTaskResumeAll();
   
+  for(int i=0;i<=10;i++){ 
+      vTaskSuspendAll();
+      Dxl.writeByte(BROADCAST_ID,P_P_Gain,25);
+      Dxl.writeByte(BROADCAST_ID,P_I_Gain,1);
+      Dxl.writeByte(BROADCAST_ID,P_D_Gain,0);
+      
+      Dxl.writeByte(Id_Head_Pan ,P_P_Gain,20);
+      Dxl.writeByte(Id_Head_Tilt,P_P_Gain,15);
+      
+      Dxl.writeByte(Id_Right_Arm_Pitch,P_P_Gain,10);
+      Dxl.writeByte(Id_Right_Arm_Roll,P_P_Gain,10);
+      Dxl.writeByte(Id_Left_Arm_Pitch,P_P_Gain,10);
+      Dxl.writeByte(Id_Left_Arm_Roll,P_P_Gain,10);
+      
+      xTaskResumeAll();
+      vTaskDelay(5);
+  }
+    
   //main task loop
   for( ;; ){
     DCM_Loop_Cnt++;
@@ -203,18 +195,7 @@ void vDCM_Update_Task( void *pvParameters ){
     //if(digitalRead(BUTTON2_485EXP) == 1){
     //  
     //}
-      
-    if(DCM_Loop_Cnt==1){
-      vTaskSuspendAll();
-      Dxl.writeByte(BROADCAST_ID,P_P_Gain,32);
-      Dxl.writeByte(BROADCAST_ID,P_I_Gain,1);
-      Dxl.writeByte(BROADCAST_ID,P_D_Gain,0);
-      
-      Dxl.writeByte(Id_Head_Pan ,P_P_Gain,20);
-      Dxl.writeByte(Id_Head_Tilt,P_P_Gain,15);
-      xTaskResumeAll();
-    }
-    
+     
     //update actuators position and speed
     if(Actuators_Update==0){
       vTaskSuspendAll();
@@ -398,12 +379,13 @@ void Calculate_Euler_Angles(){
     PrevTime = micros(); 
     //if(dt>100.0)dt=0.0001;    
     
-    vTaskSuspendAll();  
+    vTaskSuspendAll();
+    noInterrupts();  
     MPU.init_Mag(); 
     MPU.ReadXYZ(); //read all data from MPU and normalize them  
+    interrupts();
     xTaskResumeAll();
     
-    //vTaskSuspendAll();
     //calculate kalman filter of x,y,z
     MPU_Angle_X = (kalmanX.getAngle((atan(MPU.get_Az() / sqrt((MPU.get_Ax() * MPU.get_Ax()) + (MPU.get_Ay() * MPU.get_Ay()))) * RAD_TO_DEG), -MPU.get_Gx(), dt))*DEG2RAD; // Calculate the angle using a Kalman filter    
     MPU_X = MPU_Angle_X + WEP[P_IMU_X_Angle_Offset];
@@ -411,7 +393,6 @@ void Calculate_Euler_Angles(){
     MPU_Y = MPU_Angle_Y + WEP[P_IMU_Y_Angle_Offset];
     MPU_Angle_Z = (0.5 * MPU_Angle_Z) + (0.5 * (atan2 ( MPU._getRaw_CX() , MPU._getRaw_CY() ) * RAD_TO_DEG));
     MPU_Z = MPU_Angle_Z * DEG2RAD; 
-    //xTaskResumeAll(); 
     
     //XQueue.forcePush(MPU_X);
     //YQueue.forcePush(MPU_Y);
@@ -435,7 +416,5 @@ void Calculate_Euler_Angles(){
     //gyro lowpass
     Gyro_X= (WEP[P_Gyro_X_LowPass_Gain]*Gyro_X) + ((1-WEP[P_Gyro_X_LowPass_Gain])* -MPU.get_Gx());
     Gyro_Y= (WEP[P_Gyro_Y_LowPass_Gain]*Gyro_Y) + ((1-WEP[P_Gyro_Y_LowPass_Gain])*  MPU.get_Gz());
-    
-    //MPU_Z= (kalmanZ.getAngle(MPU_Angle_Z,  MPU.get_Gy(), dt))*DEG2RAD;
 }
 

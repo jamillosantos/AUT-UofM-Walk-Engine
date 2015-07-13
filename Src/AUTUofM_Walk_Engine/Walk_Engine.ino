@@ -5,7 +5,7 @@ void vWalk_Engine_Task( void *pvParameters ){
   vTaskSuspendAll();
   //Configure Robot Walk Engine... 
   Init_Robot_First();
-  Vx=0.4;        //velocity of X (forward) direction from PC (min -1 to max 1)
+  Vx=0.0;        //velocity of X (forward) direction from PC (min -1 to max 1)
   Vy=0.0;        //velocity of Y (sideward) direction
   Vt=0.0;        //velocity of T (rotate) speed (per radian)  
   Buzzer(200);
@@ -16,6 +16,7 @@ void vWalk_Engine_Task( void *pvParameters ){
 
   //get robot state
   Robot_State();
+  
   //main task loop
   for( ;; ){ 
     togglePin(RED_LED_485EXP);
@@ -54,7 +55,7 @@ void vWalk_Engine_Task( void *pvParameters ){
       switch(Internal_Motion_Request) { //check for instrcation
             case (byte)Stand_Up_Front: 
                  //run stand up
-                 Stand_Init_T(1.0, 100);
+                 Stand_Init_T(1.0, 50);
                  Check_Robot_Fall=0;
                  Actuators_Update=1;
                  Internal_Motion_Request=No_Motion;
@@ -64,7 +65,7 @@ void vWalk_Engine_Task( void *pvParameters ){
                  break;
             case (byte)Stand_Up_Back:
                  //run stand up 
-                 Stand_Init_T(1.0, 100);
+                 Stand_Init_T(1.0, 50);
                  Check_Robot_Fall=0;
                  Actuators_Update=1;
                  Internal_Motion_Request=No_Motion;
@@ -78,26 +79,26 @@ void vWalk_Engine_Task( void *pvParameters ){
       switch(Motion_Ins){  //check for instrcation
             case (byte)Motion_1:{
                  //run motion 1
-                 Stand_Init_T(1.0, 100);
+                 Stand_Init_T(1.0, 20);
                  Run_R_Kik_Motion((byte)Teen_Size_Robot_Num);
-                 Stand_Init_T(1.0, 50);
+                 Stand_Init_T(1.0, 20);
                  Motion_Ins=No_Motion;
                  }
                  break;
             case (byte)Motion_2:
                  //run motion 2
-                 Stand_Init_T(1.0, 100);
+                 Stand_Init_T(1.0, 20);
                  Run_L_Kik_Motion((byte)Teen_Size_Robot_Num);
-                 Stand_Init_T(1.0, 50);
+                 Stand_Init_T(1.0, 20);
                  Motion_Ins=No_Motion;
                  break;
             case (byte)Motion_3:
-                 Stand_Init_T(1.0, 100);
+                 Stand_Init_T(1.0, 10);
                  
                  Motion_Ins=No_Motion; 
                  break;
             case (byte)Motion_4:
-                 Stand_Init_T(1.0, 100);
+                 Stand_Init_T(1.0, 10);
                  
                  Motion_Ins=No_Motion;
                  break;
@@ -137,7 +138,7 @@ void Omni_Gait(double vx, double vy, double vt){
   double L_Arm[6];     // pitch, roll, elbow, vp, vr, ve
   double R_Arm[6];     // pitch, roll, elbow, vp, vr, ve
   
-  double Joint_Speed = 0.5;
+  double Joint_Speed = 0.3;
   
   //gait generate with for loop form  0~3.14
   for(double t=0; t<=TwoPi ;t+=WEP[P_Motion_Resolution]){ 
