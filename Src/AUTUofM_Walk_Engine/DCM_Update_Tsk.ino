@@ -61,7 +61,7 @@ void vDCM_Update_Task( void *pvParameters ){
   Set_Walk_Engine_Parameters((byte)Teen_Size_Robot_Num);
   
   portTickType xLastWakeTime;
-  const portTickType xFrequency = 25;  //10ms for each loop run time means 100Hz of task frequency
+  const portTickType xFrequency = 10;  //10ms for each loop run time means 100Hz of task frequency
   xLastWakeTime = xTaskGetTickCount ();
   
   vTaskSuspendAll();
