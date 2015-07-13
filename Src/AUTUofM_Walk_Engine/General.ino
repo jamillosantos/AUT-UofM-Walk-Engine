@@ -1,3 +1,4 @@
+/*
 void UsbInterrupt(byte* buffer, byte nCount){
   noInterrupts();
   vTaskSuspendAll();
@@ -20,7 +21,7 @@ void UsbInterrupt(byte* buffer, byte nCount){
   xTaskResumeAll();
   interrupts();  
 }
-
+*/
 
 /*
 * real time clock initialize

@@ -117,7 +117,7 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_IMU_Y_Angle_Offset]=-0.03;               
     
     //MPU filtering parametrs 
-    WEP[P_Gyro_X_LowPass_Gain]=0.9;              
+    WEP[P_Gyro_X_LowPass_Gain]=0.8;              
     WEP[P_Gyro_Y_LowPass_Gain]=0.7;             
     
     //kalman filter r mesurement value

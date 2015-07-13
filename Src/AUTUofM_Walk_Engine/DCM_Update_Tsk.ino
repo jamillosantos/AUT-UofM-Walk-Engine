@@ -118,7 +118,7 @@ void vDCM_Update_Task( void *pvParameters ){
   for(unsigned int i=0;i<=500;i++){
     togglePin(BLUE_LED_485EXP);
     Calculate_Euler_Angles();
-    vTaskDelay(20);
+    vTaskDelay(25);
   }
     
   Check_Robot_Fall=1;
@@ -158,12 +158,13 @@ void vDCM_Update_Task( void *pvParameters ){
       xTaskResumeAll();
     }
     
-    if((DCM_Loop_Cnt%5)==0){
+    if((DCM_Loop_Cnt%5)==0){ 
+      //vTaskSuspendAll();
       digitalWrite(GREEN_LED_485EXP, LOW);
-      vTaskSuspendAll();
       Send_Euler_State();
-      xTaskResumeAll();
       digitalWrite(GREEN_LED_485EXP, HIGH);
+      //xTaskResumeAll();
+      
     }
     
     //check for voltage and error if..
@@ -192,7 +193,7 @@ void vDCM_Update_Task( void *pvParameters ){
         }
       }
       else{
-        Stand_Init(0.05);
+        //Stand_Init(0.05);
         Actuators_Update=1;
       }
     }
