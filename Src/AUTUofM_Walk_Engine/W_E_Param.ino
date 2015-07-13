@@ -75,7 +75,7 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_COM_Yaw_offset]=0;                   
  
     //legs joints offset 
-    WEP[P_Left_Leg_Hip_Yaw_Offset]=0.1;           
+    WEP[P_Left_Leg_Hip_Yaw_Offset]=0.05;           
     WEP[P_Left_Leg_Hip_Roll_Offset]=0;          
     WEP[P_Left_Leg_Hip_Pitch_Offset]=0.1;          
     WEP[P_Left_Leg_Knee_Offset]=0;              
@@ -220,14 +220,14 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_COM_Yaw_offset]=0.0;                   
  
     //legs joints offset 
-    WEP[P_Left_Leg_Hip_Yaw_Offset]=0;           
+    WEP[P_Left_Leg_Hip_Yaw_Offset]=0.03;           
     WEP[P_Left_Leg_Hip_Roll_Offset]=0;          
     WEP[P_Left_Leg_Hip_Pitch_Offset]=0.1;          
     WEP[P_Left_Leg_Knee_Offset]=0;              
     WEP[P_Left_Leg_Foot_Pitch_Offset]=0.02;         
     WEP[P_Left_Leg_Foot_Roll_Offset]=0;           
 
-    WEP[P_Right_Leg_Hip_Yaw_Offset]=0;          
+    WEP[P_Right_Leg_Hip_Yaw_Offset]=0.03;          
     WEP[P_Right_Leg_Hip_Roll_Offset]=0;          
     WEP[P_Right_Leg_Hip_Pitch_Offset]=0.1;         
     WEP[P_Right_Leg_Knee_Offset]=0.0;             

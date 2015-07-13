@@ -89,9 +89,9 @@ void vDCM_Update_Task( void *pvParameters ){
   vTaskDelay(1500);
   Check_Robot_Fall=1;
   
-  for(int i=0;i<=100;i++){    
+  for(int i=0;i<=500;i++){    
       Calculate_Euler_Angles();
-      vTaskDelay(5);
+      vTaskDelay(1);
   }
   
   for(int i=0;i<=10;i++){ 
@@ -103,10 +103,10 @@ void vDCM_Update_Task( void *pvParameters ){
       Dxl.writeByte(Id_Head_Pan ,P_P_Gain,20);
       Dxl.writeByte(Id_Head_Tilt,P_P_Gain,15);
       
-      Dxl.writeByte(Id_Right_Arm_Pitch,P_P_Gain,10);
-      Dxl.writeByte(Id_Right_Arm_Roll,P_P_Gain,10);
-      Dxl.writeByte(Id_Left_Arm_Pitch,P_P_Gain,10);
-      Dxl.writeByte(Id_Left_Arm_Roll,P_P_Gain,10);
+      Dxl.writeByte(Id_Right_Arm_Pitch,P_P_Gain,5);
+      Dxl.writeByte(Id_Right_Arm_Roll,P_P_Gain,5);
+      Dxl.writeByte(Id_Left_Arm_Pitch,P_P_Gain,5);
+      Dxl.writeByte(Id_Left_Arm_Roll,P_P_Gain,5);
       
       xTaskResumeAll();
       vTaskDelay(5);
