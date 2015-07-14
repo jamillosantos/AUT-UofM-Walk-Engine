@@ -4,7 +4,7 @@ void vWalk_Engine_Task( void *pvParameters ){
   vTaskSuspendAll();
   //Configure Robot Walk Engine... 
   Init_Robot_First();
-  Vx=0.0;        //velocity of X (forward) direction from PC (min -1 to max 1)
+  Vx=0.0001;        //velocity of X (forward) direction from PC (min -1 to max 1)
   Vy=0.0;        //velocity of Y (sideward) direction
   Vt=0.0;        //velocity of T (rotate) speed (per radian)  
   Buzzer(200);

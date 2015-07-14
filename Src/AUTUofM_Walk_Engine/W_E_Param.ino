@@ -19,8 +19,8 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[Vt_Offset]=-0.006;
     
     //Walk Engine Parameters
-    WEP[P_Motion_Resolution]=0.25; //0.15
-    WEP[P_Gait_Frequency]=0.25;  //0.15                    
+    WEP[P_Motion_Resolution]=0.12; //0.15
+    WEP[P_Gait_Frequency]=0.1;  //0.15                    
     WEP[P_Double_Support_Sleep]=40;               
     WEP[P_Single_Support_Sleep]=0;                 
     WEP[P_Fly_Roll_Gain]=0.005; //-0.01                       
@@ -159,42 +159,42 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
   else if (Robot_Num==1){
     WEP[P_Leg_Length]=365.0;
     
-    WEP[Vx_Offset]=-0.1;
+    WEP[Vx_Offset]=-0.105;
     WEP[Vy_Offset]=0;
-    WEP[Vt_Offset]=0;
+    WEP[Vt_Offset]=-0.016;
     
     //Walk Engine Parameters
-    WEP[P_Motion_Resolution]=0.25; //0.15
-    WEP[P_Gait_Frequency]=0.25;  //0.15                    
-    WEP[P_Double_Support_Sleep]=40;               
+    WEP[P_Motion_Resolution]=0.15; //0.15
+    WEP[P_Gait_Frequency]=0.1;  //0.15                    
+    WEP[P_Double_Support_Sleep]=50;               
     WEP[P_Single_Support_Sleep]=0;                 
     WEP[P_Fly_Roll_Gain]=0.005; //-0.01                       
     WEP[P_Fly_Pitch_Gain]=0.8;                     
     WEP[P_Fly_Yaw_Gain]=0;                     
     WEP[P_Fly_X_Swing_Gain]=0;                  
-    WEP[P_Fly_Y_Swing_Gain]=0.05;                  
-    WEP[P_Fly_Z_Swing_Gain]=0.7;                   
-    WEP[P_Support_Roll_Gain]=0.12;               
-    WEP[P_Support_Pitch_Gain]=0;                
+    WEP[P_Fly_Y_Swing_Gain]=0.03;                  
+    WEP[P_Fly_Z_Swing_Gain]=0.8;                   
+    WEP[P_Support_Roll_Gain]=0.1;               
+    WEP[P_Support_Pitch_Gain]=0.01;                
     WEP[P_Support_Yaw_Gain]=0;               
     WEP[P_Support_X_Swing_Gain]=0;           
-    WEP[P_Support_Y_Swing_Gain]=0;            
+    WEP[P_Support_Y_Swing_Gain]=-0.1;            
     WEP[P_Support_Z_Swing_Gain]=0.0;              
     WEP[P_Body_X_Swing_Gain]=0;                   
-    WEP[P_Body_Y_Swing_Gain]=0.15; //0.15                
+    WEP[P_Body_Y_Swing_Gain]=0.1; //0.15                
     WEP[P_Body_Z_Swing_Gain]=0;                  
 
     //stablization parameters
-    WEP[P_Stablizer_Arm_Pitch_Gain]=-3.0;   //-2.5       
+    WEP[P_Stablizer_Arm_Pitch_Gain]=-3.5;   //-2.5       
     WEP[P_Stablizer_Arm_Roll_Gain]=1.2;      //2       
     WEP[P_Stablizer_Arm_Elbow_Gain]=0;           
     WEP[P_Stablizer_Hip_Roll_Gain]=0;   //-1.5        
-    WEP[P_Stablizer_Hip_Pitch_Gain]=-0.2; //-1           
+    WEP[P_Stablizer_Hip_Pitch_Gain]=-0.1; //-1           
     WEP[P_Stablizer_Knee_Gain]=0; //-1               
-    WEP[P_Stablizer_Foot_Pitch_Gain]=-0.4;  //-1          
+    WEP[P_Stablizer_Foot_Pitch_Gain]=-0.1;  //-1          
     WEP[P_Stablizer_Foot_Roll_Gain]=0; //-1           
-    WEP[P_Stablizer_COM_X_Shift_Gain]=10; //200         
-    WEP[P_Stablizer_COM_Y_Shift_Gain]=30;//200        
+    WEP[P_Stablizer_COM_X_Shift_Gain]=5; //200         
+    WEP[P_Stablizer_COM_Y_Shift_Gain]=10;//200        
 
     WEP[P_Gyro_Stablizer_Arm_Pitch_Gain]=-0.00001;  //0.001      
     WEP[P_Gyro_Stablizer_Arm_Roll_Gain]=0;       
@@ -202,7 +202,7 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_Gyro_Stablizer_Hip_Roll_Gain]=0;      
     WEP[P_Gyro_Stablizer_Hip_Pitch_Gain]=0;     
     WEP[P_Gyro_Stablizer_Knee_Gain]=0;           
-    WEP[P_Gyro_Stablizer_Foot_Pitch_Gain]=-0.000002; //-0.001     
+    WEP[P_Gyro_Stablizer_Foot_Pitch_Gain]=-0.000005; //-0.001     
     WEP[P_Gyro_Stablizer_Foot_Roll_Gain]=0;     
     WEP[P_Gyro_Stablizer_COM_X_Shift_Gain]=0;//0.5     
     WEP[P_Gyro_Stablizer_COM_Y_Shift_Gain]=0;   
@@ -220,17 +220,17 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_COM_Yaw_offset]=0.0;                   
  
     //legs joints offset 
-    WEP[P_Left_Leg_Hip_Yaw_Offset]=0.03;           
+    WEP[P_Left_Leg_Hip_Yaw_Offset]=0.07;           
     WEP[P_Left_Leg_Hip_Roll_Offset]=0;          
     WEP[P_Left_Leg_Hip_Pitch_Offset]=0.1;          
-    WEP[P_Left_Leg_Knee_Offset]=0;              
+    WEP[P_Left_Leg_Knee_Offset]=0.07;              
     WEP[P_Left_Leg_Foot_Pitch_Offset]=0.02;         
     WEP[P_Left_Leg_Foot_Roll_Offset]=0;           
 
-    WEP[P_Right_Leg_Hip_Yaw_Offset]=0.03;          
+    WEP[P_Right_Leg_Hip_Yaw_Offset]=0.07;          
     WEP[P_Right_Leg_Hip_Roll_Offset]=0;          
     WEP[P_Right_Leg_Hip_Pitch_Offset]=0.1;         
-    WEP[P_Right_Leg_Knee_Offset]=0.0;             
+    WEP[P_Right_Leg_Knee_Offset]=0.07;             
     WEP[P_Right_Leg_Foot_Pitch_Offset]=0.21;        
     WEP[P_Right_Leg_Foot_Roll_Offset]=0;         
 
@@ -249,13 +249,13 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_Right_Leg_Pitch_Offset]=0;            
     WEP[P_Right_Leg_Yaw_Offset]=0;             
     
-    WEP[P_R_Arm_Pitch_offset]=-0.3;               
+    WEP[P_R_Arm_Pitch_offset]=-0.5;               
     WEP[P_R_Arm_Roll_offset]=-1.45;               
     WEP[P_R_Arm_Elbow_offset]=1.3;              
     
-    WEP[P_L_Arm_Pitch_offset]=-0.3;                
+    WEP[P_L_Arm_Pitch_offset]=-0.5;                
     WEP[P_L_Arm_Roll_offset]=-1.45;               
-    WEP[P_L_Arm_Elbow_offset]=1.3;                     
+    WEP[P_L_Arm_Elbow_offset]=1.;                     
                    
     //imu offset
     WEP[P_IMU_X_Angle_Offset]= -0.1;              

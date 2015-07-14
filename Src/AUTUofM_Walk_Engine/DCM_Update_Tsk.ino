@@ -50,6 +50,7 @@ unsigned long int DCM_Loop_Cnt=0;
 #define P_D_Gain              26
 #define P_Baud_Rate           4
 #define P_Return_Delay_Time   5
+#define P_Status_LED          25
 
 //joints direction for robot joints
 int Joints_Direction[NUM_OF_DXL];
@@ -125,10 +126,12 @@ void vDCM_Update_Task( void *pvParameters ){
     
   Check_Robot_Fall=1;
   
+  byte LED_Mod=1;
+  
   //main task loop
   for( ;; ){
     DCM_Loop_Cnt++;
-    if(DCM_Loop_Cnt>=50) DCM_Loop_Cnt=0;
+    if(DCM_Loop_Cnt>=100) DCM_Loop_Cnt=0;  //50
     
     //check for data recive from USB serial
     if(SerialUSB.available()==7){
@@ -185,6 +188,15 @@ void vDCM_Update_Task( void *pvParameters ){
       Send_Euler_State();
       digitalWrite(GREEN_LED_485EXP, HIGH);
     }
+    
+    //motors led
+    if ((DCM_Loop_Cnt==1) || (DCM_Loop_Cnt==5)){
+      vTaskSuspendAll();
+      Dxl.writeByte(BROADCAST_ID,P_Status_LED  ,LED_Mod);
+      xTaskResumeAll();
+      LED_Mod= (LED_Mod==1) ? 0 : 1;
+    }
+    
     
     //check for voltage and error if..
     if(System_Voltage<=(int)(WEP[P_Min_Voltage_Limit]+2)){
@@ -275,6 +287,15 @@ void vDCM_Update_Task( void *pvParameters ){
 void Set_Head(double Pan, double Tilt, double Pan_Speed, double Tilt_Speed){
   Head_Pan_Angle=Pan;
   Head_Tilt_Angle=Tilt;
+  
+  //check for head limitation
+  if(Head_Pan_Angle >  (Pi/2.0)) Head_Pan_Angle =  (Pi/2.0);
+  if(Head_Pan_Angle < -(Pi/2.0)) Head_Pan_Angle = -(Pi/2.0);
+  
+  //check for head tilit limitation
+  if(Head_Tilt_Angle >  (Pi/2.0)) Head_Tilt_Angle =  (Pi/2.0);
+  if(Head_Tilt_Angle < -(Pi/3.0)) Head_Tilt_Angle = -(Pi/3.0);
+  
   Head_Pan_Speed=Pan_Speed;
   Head_Tilt_Speed=Tilt_Speed;
 }
