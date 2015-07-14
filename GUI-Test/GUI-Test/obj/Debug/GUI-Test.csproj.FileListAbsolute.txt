@@ -10,3 +10,9 @@ U:\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\obj\Debug\GUI-Test.pdb
 \\psf\Home\Documents\GitHub\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\bin\Debug\GUI-Test.exe.config
 \\psf\Home\Documents\GitHub\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\obj\Debug\GUI-Test.exe
 \\psf\Home\Documents\GitHub\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\obj\Debug\GUI-Test.pdb
+\\psf\Home\Documents\GitHub\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\bin\Debug\GUI-Test.exe
+\\psf\Home\Documents\GitHub\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\bin\Debug\GUI-Test.pdb
+\\psf\Home\Documents\GitHub\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\obj\Debug\GUI-Test.csprojResolveAssemblyReference.cache
+\\psf\Home\Documents\GitHub\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\obj\Debug\GUI_Test.Form1.resources
+\\psf\Home\Documents\GitHub\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\obj\Debug\GUI_Test.Properties.Resources.resources
+\\psf\Home\Documents\GitHub\AUT-UofM-Walk-Engine\GUI-Test\GUI-Test\obj\Debug\GUI-Test.csproj.GenerateResource.Cache

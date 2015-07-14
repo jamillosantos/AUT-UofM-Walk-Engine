@@ -85,9 +85,9 @@ void vDCM_Update_Task( void *pvParameters ){
   
   xTaskResumeAll();
   
-  vTaskDelay(500);
+  vTaskDelay(10);
   DXL_Write_PS();
-  vTaskDelay(500);
+  vTaskDelay(10);
   
   MPU_X=0.0;
   MPU_Y=0.0;
@@ -97,6 +97,7 @@ void vDCM_Update_Task( void *pvParameters ){
   kalmanX.setAngle(0.0); // Set starting angle
   kalmanY.setAngle(0.0);
   
+  /*
   for(int i=0;i<=10;i++){ 
       vTaskSuspendAll();
       Dxl.writeByte(BROADCAST_ID,P_P_Gain,25);
@@ -114,11 +115,12 @@ void vDCM_Update_Task( void *pvParameters ){
       xTaskResumeAll();
       vTaskDelay(5);
   }
+  */
   
-  for(unsigned int i=0;i<=500;i++){
+  for(unsigned int i=0;i<=1000;i++){
     togglePin(BLUE_LED_485EXP);
     Calculate_Euler_Angles();
-    vTaskDelay(25);
+    vTaskDelay(10);
   }
     
   Check_Robot_Fall=1;
@@ -128,6 +130,7 @@ void vDCM_Update_Task( void *pvParameters ){
     DCM_Loop_Cnt++;
     if(DCM_Loop_Cnt>=50) DCM_Loop_Cnt=0;
     
+    //check for data recive from USB serial
     if(SerialUSB.available()==7){
       byte buffer[7];
       SerialUSB.read(buffer,7);
@@ -149,22 +152,38 @@ void vDCM_Update_Task( void *pvParameters ){
       xTaskResumeAll();
     }
     
-    
+    //calculate euler angles
     Calculate_Euler_Angles();
     
+    //update voltage and PID
     if(DCM_Loop_Cnt==1){
       vTaskSuspendAll();
       System_Voltage=(0.5*System_Voltage)+(0.5*((int)Dxl.readByte(Id_Head_Pan, P_PRESENT_VOLTAGE)));
+      
+      if((Motion_Ins==No_Motion) && (Internal_Motion_Request==No_Motion )){
+        Dxl.writeByte(BROADCAST_ID,P_P_Gain ,25);
+        Dxl.writeByte(BROADCAST_ID,P_I_Gain ,1);
+        Dxl.writeByte(BROADCAST_ID,P_D_Gain ,0);
+      
+        Dxl.writeByte(Id_Head_Pan ,P_P_Gain ,20);
+        Dxl.writeByte(Id_Head_Tilt,P_P_Gain ,15);
+      
+        Dxl.writeByte(Id_Right_Arm_Pitch,P_P_Gain ,5);
+        Dxl.writeByte(Id_Right_Arm_Roll,P_P_Gain  ,5);
+        Dxl.writeByte(Id_Right_Arm_Elbow,P_P_Gain ,5);
+        
+        Dxl.writeByte(Id_Left_Arm_Pitch,P_P_Gain  ,5);
+        Dxl.writeByte(Id_Left_Arm_Roll,P_P_Gain   ,5);
+        Dxl.writeByte(Id_Left_Arm_Elbow,P_P_Gain  ,5);
+      }   
       xTaskResumeAll();
     }
     
-    if((DCM_Loop_Cnt%5)==0){ 
-      //vTaskSuspendAll();
+    //send data to the usb serial port
+    if((DCM_Loop_Cnt%10)==0){ 
       digitalWrite(GREEN_LED_485EXP, LOW);
       Send_Euler_State();
       digitalWrite(GREEN_LED_485EXP, HIGH);
-      //xTaskResumeAll();
-      
     }
     
     //check for voltage and error if..
@@ -215,7 +234,7 @@ void vDCM_Update_Task( void *pvParameters ){
     }
     */
     
-    //
+    //chek for pickup
     if(digitalRead(11) == 1){
       Internal_Motion_Request=Stop_Motion;
     }
@@ -242,9 +261,11 @@ void vDCM_Update_Task( void *pvParameters ){
     else{
       DXL_Write_PS();
     }
-     
+    
+    //update head update 
     DXL_Write_Head();
     
+    //wait for RTOS task
     digitalWrite(BLUE_LED_485EXP, LOW); 
     vTaskDelayUntil( &xLastWakeTime, xFrequency );
     digitalWrite(BLUE_LED_485EXP, HIGH);

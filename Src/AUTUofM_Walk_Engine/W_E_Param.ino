@@ -40,7 +40,7 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_Body_Z_Swing_Gain]=0;                   
 
     //stablization parameters
-    WEP[P_Stablizer_Arm_Pitch_Gain]=-2.5;   //-2.5       
+    WEP[P_Stablizer_Arm_Pitch_Gain]=-4.5;   //-2.5       
     WEP[P_Stablizer_Arm_Roll_Gain]=1.2;      //2       
     WEP[P_Stablizer_Arm_Elbow_Gain]=0;           
     WEP[P_Stablizer_Hip_Roll_Gain]=0;   //-1.5        
@@ -51,7 +51,7 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_Stablizer_COM_X_Shift_Gain]=5; //200         
     WEP[P_Stablizer_COM_Y_Shift_Gain]=10;//200        
 
-    WEP[P_Gyro_Stablizer_Arm_Pitch_Gain]=-0.0;  //0.001      
+    WEP[P_Gyro_Stablizer_Arm_Pitch_Gain]=-0.00001;  //0.001      
     WEP[P_Gyro_Stablizer_Arm_Roll_Gain]=0;       
     WEP[P_Gyro_Stablizer_Arm_Elbow_Gain]=0;      
     WEP[P_Gyro_Stablizer_Hip_Roll_Gain]=0;      

@@ -47,7 +47,7 @@ void vWalk_Engine_Task( void *pvParameters ){
         Stand_Init(0.05);
       }
       
-      vTaskDelay(30);
+      vTaskDelay(20);
       
       //run standup motions
       switch(Internal_Motion_Request) { //check for instrcation
