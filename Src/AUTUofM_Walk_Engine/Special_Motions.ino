@@ -1,4 +1,23 @@
-  
+ void Change_Pid(){
+        vTaskSuspendAll(); 
+        Dxl.writeByte(BROADCAST_ID,P_P_Gain ,25);
+        Dxl.writeByte(BROADCAST_ID,P_I_Gain ,1);
+        Dxl.writeByte(BROADCAST_ID,P_D_Gain ,0);
+      
+        Dxl.writeByte(Id_Head_Pan ,P_P_Gain ,20);
+        Dxl.writeByte(Id_Head_Tilt,P_P_Gain ,15);
+      
+        Dxl.writeByte(Id_Right_Arm_Pitch,P_P_Gain ,5);
+        Dxl.writeByte(Id_Right_Arm_Roll,P_P_Gain  ,5);
+        Dxl.writeByte(Id_Right_Arm_Elbow,P_P_Gain ,5);
+        
+        Dxl.writeByte(Id_Left_Arm_Pitch,P_P_Gain  ,5);
+        Dxl.writeByte(Id_Left_Arm_Roll,P_P_Gain   ,5);
+        Dxl.writeByte(Id_Left_Arm_Elbow,P_P_Gain  ,5);
+        xTaskResumeAll();
+ } 
+ 
+ 
   void Motion_Stand_Up_Front(byte Robot_Num){
     // Ten Size Akbar=0  Asghar=1
     if (Robot_Num==0){

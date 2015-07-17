@@ -4,7 +4,7 @@ void vWalk_Engine_Task( void *pvParameters ){
   vTaskSuspendAll();
   //Configure Robot Walk Engine... 
   Init_Robot_First();
-  Vx=0.0001;        //velocity of X (forward) direction from PC (min -1 to max 1)
+  Vx=0.0;        //velocity of X (forward) direction from PC (min -1 to max 1)
   Vy=0.0;        //velocity of Y (sideward) direction
   Vt=0.0;        //velocity of T (rotate) speed (per radian)  
   Buzzer(200);
@@ -15,6 +15,7 @@ void vWalk_Engine_Task( void *pvParameters ){
   //stand for first time
   Stand_Init_T(0.05,300);
   
+  Check_Robot_Fall==1;
   //main task loop
   for( ;; ){ 
     togglePin(RED_LED_485EXP);
@@ -53,23 +54,27 @@ void vWalk_Engine_Task( void *pvParameters ){
       switch(Internal_Motion_Request) { //check for instrcation
             case (byte)Stand_Up_Front: 
                  //run stand up
-                 Stand_Init_T(1.0, 50);
-                 Check_Robot_Fall=0;
+                 vTaskDelay(1000);
+                 Check_Robot_Fall=0;                
                  Actuators_Update=1;
-                 Internal_Motion_Request=No_Motion;
-                 Motion_Stand_Up_Front((byte)Teen_Size_Robot_Num);
-                 Check_Robot_Fall=1;
                  Stand_Init_T(1.0, 50);
+                 //Internal_Motion_Request=No_Motion;
+                 Motion_Stand_Up_Front((byte)Teen_Size_Robot_Num);
+                 Internal_Motion_Request=No_Motion;     
+                 Stand_Init_T(1.0, 50);
+                 Check_Robot_Fall=1;
                  break;
             case (byte)Stand_Up_Back:
                  //run stand up 
-                 Stand_Init_T(1.0, 50);
+                 vTaskDelay(1000);
                  Check_Robot_Fall=0;
                  Actuators_Update=1;
-                 Internal_Motion_Request=No_Motion;
+                 Stand_Init_T(1.0, 50);
+                 //Internal_Motion_Request=No_Motion;
                  Motion_Stand_Up_Back((byte)Teen_Size_Robot_Num);
-                 Check_Robot_Fall=1;
-                 Stand_Init_T(1.0, 50);              
+                 Internal_Motion_Request=No_Motion;
+                 Stand_Init_T(1.0, 50); 
+                 Check_Robot_Fall=1;             
                  break;
       }
       
@@ -218,7 +223,6 @@ byte Get_Robot_State(double Roll, double Pitch){
   if(Pitch<=(-WEP[P_Fall_Pitch_Thershold])){
     return Fallen_Back;
   }
-    
   return Normal_Stand;  
 }
 
@@ -227,22 +231,44 @@ void Robot_State(){
     switch (Get_Robot_State(MPU_Y, MPU_X)){
       case (byte)Fallen_Front:{
            //run stand motion from front
+           Check_Robot_Fall=0;
+           vTaskSuspendAll();
+           Dxl.writeByte(BROADCAST_ID,P_TORQUE_ENABLE,0);
+           Dxl.writeByte(Id_Head_Pan,P_TORQUE_ENABLE,1);
+           Dxl.writeByte(Id_Head_Tilt,P_TORQUE_ENABLE,1);
+           xTaskResumeAll();
+            
            Internal_Motion_Request=Stand_Up_Front;
+           //Buzzer(200);
+           vTaskDelay(1500);
            }
            break;
       case (byte)Fallen_Back:{
            //run stand motion from front
+           Check_Robot_Fall=0;
+           vTaskSuspendAll();
+           Dxl.writeByte(BROADCAST_ID,P_TORQUE_ENABLE,0);
+           Dxl.writeByte(Id_Head_Pan,P_TORQUE_ENABLE,1);
+           Dxl.writeByte(Id_Head_Tilt,P_TORQUE_ENABLE,1);
+           xTaskResumeAll();
+            
            Internal_Motion_Request=Stand_Up_Back;
+           vTaskDelay(1500);
+            //Buzzer(200);
            }
            break;
       case (byte)Fallen_Right:{
            //run stand motion from front
+           Check_Robot_Fall=0;
            Internal_Motion_Request=Stand_Up_Front;  //?????????
+            //Buzzer(200);
            }
            break;  
       case (byte)Fallen_Left:{
            //run stand motion from front
+           Check_Robot_Fall=0;
            Internal_Motion_Request=Stand_Up_Back;  //??????
+            //Buzzer(200);
            }
            break;  
       case (byte)Normal_Stand:

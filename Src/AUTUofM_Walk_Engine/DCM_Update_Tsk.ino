@@ -207,24 +207,25 @@ void vDCM_Update_Task( void *pvParameters ){
       digitalWrite(Buzzer_Pin, LOW);
     }
     
-    //get robot state for fall
-    Robot_State();
-     
     //check for robot fall state
     if(Check_Robot_Fall==1){
+      //get robot state for fall
+      Robot_State();
+      
       if ((Internal_Motion_Request!=No_Motion ) && (Internal_Motion_Request!=Stop_Motion)) {
-        Actuators_Update=0;
+        //Actuators_Update=0;
         switch (Internal_Motion_Request){
-          case Stand_Up_Front:
-            Set_Head(0,-0.6,1023,1023);
+          case Stand_Up_Front:{
+            Set_Head(0,-0.4,1023,1023);
+          }
             break;
-          case Stand_Up_Back:
-            Set_Head(0,0.5,1023,1023);
+          case Stand_Up_Back:{
+            Set_Head(0,0.4,1023,1023);
+          }
             break;
         }
       }
       else{
-        //Stand_Init(0.05);
         Actuators_Update=1;
       }
     }
@@ -251,7 +252,9 @@ void vDCM_Update_Task( void *pvParameters ){
       Internal_Motion_Request=Stop_Motion;
     }
     else{
-      Internal_Motion_Request=No_Motion;  //release the robot stop
+      if(Internal_Motion_Request!=No_Motion){
+        Internal_Motion_Request=No_Motion;  //release the robot stop
+      }
     }
     
       
@@ -260,14 +263,16 @@ void vDCM_Update_Task( void *pvParameters ){
       Motion_Ins=Motion_1;   
     }
     
-    //if(digitalRead(BUTTON2_485EXP) == 1){
-    //  
-    //}
+    if(digitalRead(BUTTON2_485EXP) == 1){
+      Motion_Ins=Motion_2; 
+    }
      
     //update actuators position and speed
     if(Actuators_Update==0){
       vTaskSuspendAll();
       Dxl.writeByte(BROADCAST_ID,P_TORQUE_ENABLE,0);
+      Dxl.writeByte(Id_Head_Pan,P_TORQUE_ENABLE,1);
+      Dxl.writeByte(Id_Head_Tilt,P_TORQUE_ENABLE,1);
       xTaskResumeAll();
     }
     else{
