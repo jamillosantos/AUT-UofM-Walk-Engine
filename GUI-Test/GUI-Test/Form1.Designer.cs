@@ -87,7 +87,6 @@
             this.groupBox1.TabIndex = 110;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Com Port";
-            this.groupBox1.Enter += new System.EventHandler(this.groupBox1_Enter);
             // 
             // label1
             // 
@@ -130,7 +129,6 @@
             this.cmb_com.Size = new System.Drawing.Size(99, 21);
             this.cmb_com.TabIndex = 1;
             this.cmb_com.Text = "COM4";
-            this.cmb_com.SelectedIndexChanged += new System.EventHandler(this.cmb_com_SelectedIndexChanged);
             this.cmb_com.Click += new System.EventHandler(this.cmb_com_Click);
             // 
             // btn_PortOpen
@@ -177,7 +175,7 @@
             this.toolStripStatusLabel1});
             this.statusStrip1.Location = new System.Drawing.Point(0, 124);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(902, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(635, 22);
             this.statusStrip1.TabIndex = 115;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -211,7 +209,7 @@
             1,
             0,
             0,
-            131072});
+            65536});
             this.num_Vx.Location = new System.Drawing.Point(245, 13);
             this.num_Vx.Maximum = new decimal(new int[] {
             1,
@@ -235,7 +233,7 @@
             1,
             0,
             0,
-            131072});
+            65536});
             this.num_Vy.Location = new System.Drawing.Point(245, 39);
             this.num_Vy.Maximum = new decimal(new int[] {
             1,
@@ -259,7 +257,7 @@
             1,
             0,
             0,
-            131072});
+            65536});
             this.num_Vt.Location = new System.Drawing.Point(245, 67);
             this.num_Vt.Maximum = new decimal(new int[] {
             1,
@@ -332,7 +330,7 @@
             1,
             0,
             0,
-            131072});
+            65536});
             this.num_Pan.Location = new System.Drawing.Point(413, 12);
             this.num_Pan.Maximum = new decimal(new int[] {
             314,
@@ -356,7 +354,7 @@
             1,
             0,
             0,
-            131072});
+            65536});
             this.num_Tillt.Location = new System.Drawing.Point(413, 38);
             this.num_Tillt.Maximum = new decimal(new int[] {
             314,
@@ -461,7 +459,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(902, 146);
+            this.ClientSize = new System.Drawing.Size(635, 146);
             this.Controls.Add(this.label14);
             this.Controls.Add(this.num_delay);
             this.Controls.Add(this.label13);

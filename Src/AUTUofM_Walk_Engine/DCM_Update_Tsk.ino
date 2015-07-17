@@ -127,6 +127,7 @@ void vDCM_Update_Task( void *pvParameters ){
   Check_Robot_Fall=1;
   
   byte LED_Mod=1;
+  Internal_Motion_Request=No_Motion;
   
   //main task loop
   for( ;; ){
@@ -134,9 +135,9 @@ void vDCM_Update_Task( void *pvParameters ){
     if(DCM_Loop_Cnt>=100) DCM_Loop_Cnt=0;  //50
     
     //check for data recive from USB serial
-    if(SerialUSB.available()==7){
-      byte buffer[7];
-      SerialUSB.read(buffer,7);
+    if(SerialUSB.available()==9){
+      byte buffer[9];
+      SerialUSB.read(buffer,9);
       vTaskSuspendAll();
       digitalWrite(BOARD_LED_PIN,LOW);
       if(buffer[0]==254){
@@ -148,7 +149,15 @@ void vDCM_Update_Task( void *pvParameters ){
                 Motion_Ins = (Internal_Motion_Request==No_Motion ) ? buffer[4] : No_Motion;
                                 
                 if (Internal_Motion_Request==No_Motion ){
-                  Set_Head((double)((((byte)buffer[5]-100)*Pi)/100.0),(double)((((byte)buffer[6]-100)*Pi)/100.0),WEP[P_Head_Pan_Speed],WEP[P_Head_Tilt_Speed]);
+                  //head data update
+                  unsigned long T=0;
+                  T =((unsigned long) ((unsigned long)(buffer[6] << 8) + ((byte)buffer[5])));
+                  double Pan_Angle= (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));       
+                
+                  T =((unsigned long) ((unsigned long)(buffer[8] << 8) + ((byte)buffer[7])));
+                  double Tilt_Angle= (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
+                
+                  Set_Head(Pan_Angle,Tilt_Angle,WEP[P_Head_Pan_Speed],WEP[P_Head_Tilt_Speed]);
                 }
       }
       digitalWrite(BOARD_LED_PIN,HIGH);
@@ -477,6 +486,12 @@ void Calculate_Euler_Angles(){
     MPU_Y = MPU_Angle_Y + WEP[P_IMU_Y_Angle_Offset];
     MPU_Angle_Z = (0.5 * MPU_Angle_Z) + (0.5 * (atan2 ( MPU._getRaw_CX() , MPU._getRaw_CY() ) * RAD_TO_DEG));
     MPU_Z = MPU_Angle_Z * DEG2RAD; 
+    
+    if (MPU_X> 1.0)  MPU_X =  1.0;
+    if (MPU_X< -1.0) MPU_X = -1.0;
+    
+    if (MPU_Y> 1.0)  MPU_Y =  1.0;
+    if (MPU_Y< -1.0) MPU_Y = -1.0;
     
     //XQueue.forcePush(MPU_X);
     //YQueue.forcePush(MPU_Y);

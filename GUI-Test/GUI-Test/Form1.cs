@@ -176,14 +176,16 @@ namespace GUI_Test
             out_p[1] = (byte)Vx;
             out_p[2] = (byte)Vy;
             out_p[3] = (byte)Vt;
-            out_p[4] = Motion;
-            out_p[5] = (byte)((((double)num_Pan.Value * 100) / 3.1415) + 100);
-            out_p[6] = (byte)((((double)num_Tillt.Value * 100) / 3.1415) + 100);
+            out_p[4] = Motion; //no motion is 100
+            out_p[5] = 0;
+            out_p[6] = 0;
+            out_p[7] = 0;
+            out_p[8] = 0;
 
            // textBox4.Text = freg.ToString();
             try
             {
-                SD_Com.Write(out_p, 0, 7);
+                SD_Com.Write(out_p, 0, 9);
             }
             catch
             { }
@@ -221,16 +223,6 @@ namespace GUI_Test
             textBox1.Text = freg1.ToString();
             freg = 0;
             freg1 = 0;
-        }
-
-        private void groupBox1_Enter(object sender, EventArgs e)
-        {
-
-        }
-
-        private void cmb_com_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }

@@ -52,7 +52,7 @@ void vWalk_Engine_Task( void *pvParameters ){
       
       //run standup motions
       switch(Internal_Motion_Request) { //check for instrcation
-            case (byte)Stand_Up_Front: 
+            case (byte)Stand_Up_Front:{ 
                  //run stand up
                  vTaskDelay(1000);
                  Check_Robot_Fall=0;                
@@ -63,8 +63,9 @@ void vWalk_Engine_Task( void *pvParameters ){
                  Internal_Motion_Request=No_Motion;     
                  Stand_Init_T(1.0, 50);
                  Check_Robot_Fall=1;
+            }
                  break;
-            case (byte)Stand_Up_Back:
+            case (byte)Stand_Up_Back:{
                  //run stand up 
                  vTaskDelay(1000);
                  Check_Robot_Fall=0;
@@ -74,7 +75,8 @@ void vWalk_Engine_Task( void *pvParameters ){
                  Motion_Stand_Up_Back((byte)Teen_Size_Robot_Num);
                  Internal_Motion_Request=No_Motion;
                  Stand_Init_T(1.0, 50); 
-                 Check_Robot_Fall=1;             
+                 Check_Robot_Fall=1;  
+            }           
                  break;
       }
       
@@ -146,8 +148,8 @@ void Omni_Gait(double vx, double vy, double vt){
   //gait generate with for loop form  0~3.14
   for(double t=0; t<=TwoPi ;t+=WEP[P_Motion_Resolution]){ 
    
-    if (Vx >  0.5)  Vx=  0.5;
-    if (Vx < -0.5)  Vx= -0.5;
+    if (Vx >  0.25)  Vx=  0.25;
+    if (Vx < -0.25)  Vx= -0.25;
     
     if (Vy >  0.5)  Vy=  0.5;
     if (Vy < -0.5)  Vy= -0.5;
@@ -232,6 +234,7 @@ void Robot_State(){
       case (byte)Fallen_Front:{
            //run stand motion from front
            Check_Robot_Fall=0;
+           
            vTaskSuspendAll();
            Dxl.writeByte(BROADCAST_ID,P_TORQUE_ENABLE,0);
            Dxl.writeByte(Id_Head_Pan,P_TORQUE_ENABLE,1);
@@ -246,6 +249,7 @@ void Robot_State(){
       case (byte)Fallen_Back:{
            //run stand motion from front
            Check_Robot_Fall=0;
+           
            vTaskSuspendAll();
            Dxl.writeByte(BROADCAST_ID,P_TORQUE_ENABLE,0);
            Dxl.writeByte(Id_Head_Pan,P_TORQUE_ENABLE,1);
@@ -260,15 +264,29 @@ void Robot_State(){
       case (byte)Fallen_Right:{
            //run stand motion from front
            Check_Robot_Fall=0;
-           Internal_Motion_Request=Stand_Up_Front;  //?????????
-            //Buzzer(200);
+           vTaskSuspendAll();
+           Dxl.writeByte(BROADCAST_ID,P_TORQUE_ENABLE,0);
+           Dxl.writeByte(Id_Head_Pan,P_TORQUE_ENABLE,1);
+           Dxl.writeByte(Id_Head_Tilt,P_TORQUE_ENABLE,1);
+           xTaskResumeAll();
+            
+           Internal_Motion_Request=Stand_Up_Front;
+           //Buzzer(200);
+           vTaskDelay(1500);
            }
-           break;  
+           break; 
       case (byte)Fallen_Left:{
            //run stand motion from front
            Check_Robot_Fall=0;
-           Internal_Motion_Request=Stand_Up_Back;  //??????
-            //Buzzer(200);
+           vTaskSuspendAll();
+           Dxl.writeByte(BROADCAST_ID,P_TORQUE_ENABLE,0);
+           Dxl.writeByte(Id_Head_Pan,P_TORQUE_ENABLE,1);
+           Dxl.writeByte(Id_Head_Tilt,P_TORQUE_ENABLE,1);
+           xTaskResumeAll();
+            
+           Internal_Motion_Request=Stand_Up_Front;
+           //Buzzer(200);
+           vTaskDelay(1500);
            }
            break;  
       case (byte)Normal_Stand:
