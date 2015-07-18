@@ -82,7 +82,7 @@ void vDCM_Update_Task( void *pvParameters ){
   
   //Configuration MPU-9150...
   MPU.init(); //initialize MPU
-  MPU.initDrift(20); //calculate drrift
+  MPU.initDrift(1000); //calculate drrift
   
   //kalman filter initialize for first time
   kalmanX.setRmeasure(WEP[P_Kalman_Roll_RM_Rate]);
@@ -206,7 +206,8 @@ void vDCM_Update_Task( void *pvParameters ){
     //send data to the usb serial port
     if((DCM_Loop_Cnt%10)==0){ 
       digitalWrite(GREEN_LED_485EXP, LOW);
-      Send_Euler_State();
+      //Send_Euler_State();
+      SerialUSB.println(MPU_Z);
       digitalWrite(GREEN_LED_485EXP, HIGH);
     }
     

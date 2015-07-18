@@ -64,7 +64,7 @@ void vDCM_Update_Task( void *pvParameters ){
   
   //the static varible for make this thread frequency fix
   portTickType xLastWakeTime;
-  const portTickType xFrequency = 10;  //10ms for each loop run time means 100Hz of task frequency
+  const portTickType xFrequency = 2;  //10ms for each loop run time means 100Hz of task frequency
   xLastWakeTime = xTaskGetTickCount ();
   
   //do some static function at first time of DCM task
@@ -82,7 +82,7 @@ void vDCM_Update_Task( void *pvParameters ){
   
   //Configuration MPU-9150...
   MPU.init(); //initialize MPU
-  MPU.initDrift(20); //calculate drrift
+  MPU.initDrift(2000); //calculate drrift
   
   //kalman filter initialize for first time
   kalmanX.setRmeasure(WEP[P_Kalman_Roll_RM_Rate]);
@@ -139,15 +139,18 @@ void vDCM_Update_Task( void *pvParameters ){
   Check_Robot_Fall=1;
   Internal_Motion_Request=No_Motion;
   
+  //update head update 
+  DXL_Write_Head();
+    
   //main task loop
   for( ;; ){
     DCM_Loop_Cnt++;
     if(DCM_Loop_Cnt>=100) DCM_Loop_Cnt=0;  //50
     
     //check for data recive from USB serial
-    if(SerialUSB.available()==9){
-      byte buffer[9];
-      SerialUSB.read(buffer,9);
+    if(SerialUSB.available()==7){
+      byte buffer[7];
+      SerialUSB.read(buffer,7);
       vTaskSuspendAll();
       digitalWrite(BOARD_LED_PIN,LOW);
       if(buffer[0]==254){
@@ -157,18 +160,6 @@ void vDCM_Update_Task( void *pvParameters ){
                 Vt = (double) ((((byte)buffer[3])-100) / 100.0);
                 
                 Motion_Ins = (Internal_Motion_Request==No_Motion ) ? buffer[4] : No_Motion;
-                                
-                if (Internal_Motion_Request==No_Motion ){
-                  //head data update
-                  unsigned long T=0;
-                  T =((unsigned long) ((unsigned long)(buffer[6] << 8) + ((byte)buffer[5])));
-                  double Pan_Angle= (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));       
-                
-                  T =((unsigned long) ((unsigned long)(buffer[8] << 8) + ((byte)buffer[7])));
-                  double Tilt_Angle= (T<=32767) ?  (double)(T/1000.0) : (double)(-((T-32767) / 1000.0));
-                
-                  Set_Head(Pan_Angle,Tilt_Angle,WEP[P_Head_Pan_Speed],WEP[P_Head_Tilt_Speed]);
-                }
       }
       digitalWrite(BOARD_LED_PIN,HIGH);
       xTaskResumeAll();
@@ -204,11 +195,11 @@ void vDCM_Update_Task( void *pvParameters ){
     }
     
     //send data to the usb serial port
-    if((DCM_Loop_Cnt%10)==0){ 
-      digitalWrite(GREEN_LED_485EXP, LOW);
-      Send_Euler_State();
-      digitalWrite(GREEN_LED_485EXP, HIGH);
-    }
+    //if((DCM_Loop_Cnt%10)==0){ 
+    //  digitalWrite(GREEN_LED_485EXP, LOW);
+    //  Send_Euler_State();
+    //  digitalWrite(GREEN_LED_485EXP, HIGH);
+    //}
     
     //motors led
     if ((DCM_Loop_Cnt==1) || (DCM_Loop_Cnt==5)){
@@ -228,29 +219,7 @@ void vDCM_Update_Task( void *pvParameters ){
       digitalWrite(Buzzer_Pin, LOW);
     }
     
-    //check for robot fall state
-    if(Check_Robot_Fall==1){
-      //get robot state for fall
-      Robot_State();
-      
-      if ((Internal_Motion_Request!=No_Motion ) && (Internal_Motion_Request!=Stop_Motion)) {
-        //Actuators_Update=0;
-        switch (Internal_Motion_Request){
-          case Stand_Up_Front:{
-            Set_Head(0,-0.4,1023,1023);
-          }
-            break;
-          case Stand_Up_Back:{
-            Set_Head(0,0.4,1023,1023);
-          }
-            break;
-        }
-      }
-      else{
-        Actuators_Update=1;
-      }
-    }
-    
+    SerialUSB.println(Gyro_X);
     /*
     double Acc=0;
     double Last_Acc=0;
@@ -278,7 +247,7 @@ void vDCM_Update_Task( void *pvParameters ){
       }
     }
     
-      
+    /*  
     //run motion if key pressed
     if(digitalRead(BUTTON1_485EXP) == 1){
       Motion_Ins=Motion_1;   
@@ -287,21 +256,12 @@ void vDCM_Update_Task( void *pvParameters ){
     if(digitalRead(BUTTON2_485EXP) == 1){
       Motion_Ins=Motion_2; 
     }
-     
-    //update actuators position and speed
-    if(Actuators_Update==0){
-      vTaskSuspendAll();
-      Dxl.writeByte(BROADCAST_ID,P_TORQUE_ENABLE,0);
-      Dxl.writeByte(Id_Head_Pan,P_TORQUE_ENABLE,1);
-      Dxl.writeByte(Id_Head_Tilt,P_TORQUE_ENABLE,1);
-      xTaskResumeAll();
-    }
-    else{
-      DXL_Write_PS();
-    }
+    */
+ 
+    DXL_Write_PS();
     
     //update head update 
-    DXL_Write_Head();
+    //DXL_Write_Head();
     
     //wait for RTOS task
     digitalWrite(BLUE_LED_485EXP, LOW); 
@@ -527,7 +487,7 @@ void Calculate_Euler_Angles(){
     */
     
     //gyro lowpass
-    Gyro_X= (WEP[P_Gyro_X_LowPass_Gain]*Gyro_X) + ((1-WEP[P_Gyro_X_LowPass_Gain])* -MPU.get_Gx());
-    Gyro_Y= (WEP[P_Gyro_Y_LowPass_Gain]*Gyro_Y) + ((1-WEP[P_Gyro_Y_LowPass_Gain])*  MPU.get_Gz());
+    Gyro_X= (WEP[P_Gyro_X_LowPass_Gain] * Gyro_X) + ((1.0-WEP[P_Gyro_X_LowPass_Gain]) * -MPU.get_Gx());
+    Gyro_Y= (WEP[P_Gyro_Y_LowPass_Gain] * Gyro_Y) + ((1.0-WEP[P_Gyro_Y_LowPass_Gain]) *  MPU.get_Gz());
 }
 

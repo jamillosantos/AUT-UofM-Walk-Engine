@@ -2,10 +2,27 @@
   void Motion_Stand_Up_Front(byte Robot_Num){
     // Ten Size Akbar=0  Asghar=1
     if (Robot_Num==0){
+
+      Actuators_Update_PID=0;
+      vTaskSuspendAll();
+      Dxl.writeByte(BROADCAST_ID,P_P_Gain ,32);
+      xTaskResumeAll();
+
       Motion_Stand_Up_Front_1();
+
+      Actuators_Update_PID=1;
     }
     else if(Robot_Num==1){
+
+      Actuators_Update_PID=0;
+      vTaskSuspendAll();
+      Dxl.writeByte(BROADCAST_ID,P_P_Gain ,32);
+      xTaskResumeAll();
+
       Motion_Stand_Up_Front_2();
+
+      Actuators_Update_PID=1;
+
     }
   }
   
@@ -13,28 +30,49 @@
   void Motion_Stand_Up_Back(byte Robot_Num){
     // Ten Size Akbar=0  Asghar=1
     if (Robot_Num==0){
+
+      Actuators_Update_PID=0;
+      vTaskSuspendAll();
+      Dxl.writeByte(BROADCAST_ID,P_P_Gain ,32);
+      xTaskResumeAll();
+
       Motion_Stand_Up_Back_1();
+
+      Actuators_Update_PID=1;
     }
     else if(Robot_Num==1){
+
+      Actuators_Update_PID=0;
+      vTaskSuspendAll();
+      Dxl.writeByte(BROADCAST_ID,P_P_Gain ,32);
+      xTaskResumeAll();
+
       Motion_Stand_Up_Back_2();
+
+      Actuators_Update_PID=1;
     }
   }
   
   void Run_R_Kik_Motion(byte Robot_Num){
+      double L_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
+  double R_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
+  double L_Arm[6];     // pitch, roll, elbow, vp, vr, ve
+  double R_Arm[6];     // pitch, roll, elbow, vp, vr, ve
+  
     //akbar
     if (Robot_Num==0){
       for(int i=0;i<=50;i++){
      delay(10);
     //right leg initialize
     L_Leg_Ik[I_X]     =0; 
-    L_Leg_Ik[I_Y]     =-50;
+    L_Leg_Ik[I_Y]     =-70;
     L_Leg_Ik[I_Z]     =0.0;
     L_Leg_Ik[I_Roll]  =0;
     L_Leg_Ik[I_Pitch] =0.00;
     L_Leg_Ik[I_Yaw]   =0.0;
     //left leh initialize
     R_Leg_Ik[I_X]     =0; 
-    R_Leg_Ik[I_Y]     =60;
+    R_Leg_Ik[I_Y]     =70;
     R_Leg_Ik[I_Z]     =0;
     R_Leg_Ik[I_Roll]  =0;
     R_Leg_Ik[I_Pitch] =0.00;
@@ -56,24 +94,25 @@
     //update robotis joints
     Update_Ik(0.02, 0.02, R_Leg_Ik, L_Leg_Ik, R_Arm, L_Arm);
     }
+    Dxl.writeByte(Id_Right_Knee,P_P_Gain ,32);
     vTaskDelay(400);
     if (Robot_Num==0){
       for(double t=0; t<=Pi ;t+=0.032){       
         //right leg initialize
         R_Leg_Ik[I_X]     =(sin(2.3 * (t-1.5)) *(1.2 * 100.0));
-        if ((t>=1) && (t<=2.8)) R_Leg_Ik[I_X]=220; 
+        if ((t>=1) && (t<=2.8)) R_Leg_Ik[I_X]=260; 
         R_Leg_Ik[I_Y]     =(sin(t)*(0.7 * 100.0));
-        R_Leg_Ik[I_Z]     =(t>=0.3) ? (sin((t*0.8)-0.01)  *(1 * 100.0)) : -15 ;
+        R_Leg_Ik[I_Z]     =(t>=0.3) ? (sin((t*0.8)-0.01)  *(1.7 * 100.0)) : -17 ;
         R_Leg_Ik[I_Roll]  =(sin(t)*(-0.1));
-        R_Leg_Ik[I_Pitch] =0.0;
+        R_Leg_Ik[I_Pitch] =0.1;
         R_Leg_Ik[I_Yaw]   =0.0;
     
         //left leh initialize
         L_Leg_Ik[I_X]     =0.0; 
         L_Leg_Ik[I_Y]     =(sin(0.8*t)*(-0.95 * 100.0));
         L_Leg_Ik[I_Z]     =0.0;
-        L_Leg_Ik[I_Roll]  =(sin(0.8*t)*(0.4));
-        L_Leg_Ik[I_Pitch] =(sin(0.8*t)*(-0.05));
+        L_Leg_Ik[I_Roll]  =(sin(0.9*t)*(0.5));
+        L_Leg_Ik[I_Pitch] =(sin(0.8*t)*(0.03));
         L_Leg_Ik[I_Yaw]   =0.0;
     
         //right arm initialize
@@ -94,7 +133,7 @@
     
         //update robotis joints
         Update_Ik(1.0, 1.0, R_Leg_Ik, L_Leg_Ik, R_Arm, L_Arm); 
-        vTaskDelay(7);
+        vTaskDelay(8);
       }//main gait timi for ins 
       Stand_Init_T(1.0, 10);
     }
@@ -106,10 +145,10 @@
       for(double t=0; t<=Pi ;t+=0.027){       
         //right leg initialize
         R_Leg_Ik[I_X]     =(sin(2.3 * (t-1.5)) *(1.8 * 100.0));
-        if ((t>=1.2) && (t<=1.7)) R_Leg_Ik[I_X]=180; 
-        R_Leg_Ik[I_Y]     =(sin(t)*(0.8 * 110.0));
-        R_Leg_Ik[I_Z]     =(t>=0.5) ? (sin((t*0.8)-0.01)  *(1.2 * 100.0)) : -15 ;
-        R_Leg_Ik[I_Roll]  =(sin(t)*(-0.1));
+        if ((t>=1.2) && (t<=1.7)) R_Leg_Ik[I_X]=220; 
+        R_Leg_Ik[I_Y]     =(sin(t*0.8)*(1 * 120.0));
+        R_Leg_Ik[I_Z]     =(t>=0.5) ? (sin((t*0.8)-0.01)  *(1.7* 100.0)) : -20 ;
+        R_Leg_Ik[I_Roll]  =(sin(t)*(-0.2));
         R_Leg_Ik[I_Pitch] =0.0;
         R_Leg_Ik[I_Yaw]   =0.0;
     
@@ -117,8 +156,8 @@
         L_Leg_Ik[I_X]     =0.0; 
         L_Leg_Ik[I_Y]     =(sin(0.8*t)*(-0.95 * 100.0));
         L_Leg_Ik[I_Z]     =0.0;
-        L_Leg_Ik[I_Roll]  =(sin(0.8*t)*(0.15));
-        L_Leg_Ik[I_Pitch] =(sin(0.8*t)*(-0.05));
+        L_Leg_Ik[I_Roll]  =(sin(0.8*t)*(0.24));
+        L_Leg_Ik[I_Pitch] =(sin(0.8*t)*(-0.07));
         L_Leg_Ik[I_Yaw]   =0.0;
     
         //right arm initialize
@@ -150,6 +189,11 @@
   
   
   void Run_L_Kik_Motion(byte Robot_Num){
+      double L_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
+  double R_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
+  double L_Arm[6];     // pitch, roll, elbow, vp, vr, ve
+  double R_Arm[6];     // pitch, roll, elbow, vp, vr, ve
+  
     // Ten Size Akbar=0  Asghar=1
     if (Robot_Num==0){
       for(int i=0;i<=50;i++){
@@ -186,7 +230,7 @@
     Update_Ik(0.02, 0.02, R_Leg_Ik, L_Leg_Ik, R_Arm, L_Arm);
     }
     vTaskDelay(400);
-    
+     Dxl.writeByte(Id_Right_Knee,P_P_Gain ,32);
       for(double t=0; t<=Pi ;t+=0.030){       
         //right leg initialize
         L_Leg_Ik[I_X]     =(sin(2.3 * (t-1.5)) *(1 * 100.0));
@@ -277,7 +321,7 @@
   
   void Motion_Stand_Up_Front_1(){
     byte delay_x=60;
-    double _Speed=0.3;
+    double _Speed=0.1;
     //all speed are betwin 0~1
     //al joint are betwin -3.14 ~ 3.14
     //right arm joints update
@@ -292,7 +336,7 @@
     Speed[Id_Right_Arm_Elbow]= _Speed;
     
     Angle[Id_Right_Arm_Pitch]= -35*DEG2RAD;
-    Angle[Id_Right_Arm_Roll] = -85*DEG2RAD ;
+    Angle[Id_Right_Arm_Roll] = -75*DEG2RAD ;
     Angle[Id_Right_Arm_Elbow]= 90*DEG2RAD;
   
     //left arm joints update  
@@ -301,7 +345,7 @@
     Speed[Id_Left_Arm_Elbow]= _Speed;
     
     Angle[Id_Left_Arm_Pitch]= -35*DEG2RAD;
-    Angle[Id_Left_Arm_Roll] = -85*DEG2RAD;
+    Angle[Id_Left_Arm_Roll] = -75*DEG2RAD;
     Angle[Id_Left_Arm_Elbow]= 90*DEG2RAD;
     
    
@@ -324,14 +368,14 @@
     Angle[Id_Right_Hip_Pitch]  =0*DEG2RAD + WEP[P_Right_Leg_Hip_Pitch_Offset];
     Angle[Id_Left_Hip_Pitch]   =0*DEG2RAD + WEP[P_Left_Leg_Hip_Pitch_Offset];  
     
-    Angle[Id_Right_Hip_Yaw]   = 0 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
-    Angle[Id_Left_Hip_Yaw]    = 0 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
+    Angle[Id_Right_Hip_Yaw]   = 30 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
+    Angle[Id_Left_Hip_Yaw]    = 30 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
     
-    Angle[Id_Right_Hip_Roll]  = 0 + WEP[P_Right_Leg_Hip_Roll_Offset];
-    Angle[Id_Left_Hip_Roll]   = 0 + WEP[P_Left_Leg_Hip_Roll_Offset];  
+    Angle[Id_Right_Hip_Roll]  = -30 + WEP[P_Right_Leg_Hip_Roll_Offset];
+    Angle[Id_Left_Hip_Roll]   = -30 + WEP[P_Left_Leg_Hip_Roll_Offset];  
       
-    Angle[Id_Right_Foot_Roll] = 0 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
-    Angle[Id_Left_Foot_Roll]  = 0 + WEP[P_Left_Leg_Foot_Roll_Offset];  
+    Angle[Id_Right_Foot_Roll] = -30 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
+    Angle[Id_Left_Foot_Roll]  = -30 + WEP[P_Left_Leg_Foot_Roll_Offset];
     
     Angle[Id_Right_Knee]       =0*DEG2RAD + WEP[P_Right_Leg_Knee_Offset]; 
     Angle[Id_Left_Knee]        =0*DEG2RAD + WEP[P_Left_Leg_Knee_Offset]; 
@@ -341,6 +385,7 @@
    
     
     }
+    _Speed=0.6;
     //33333***********************************************************************************************************
     for(int i=0;i<=15;i++){
       vTaskDelay(delay_x);
@@ -352,7 +397,7 @@
     Speed[Id_Right_Arm_Elbow]= _Speed;
     
     Angle[Id_Right_Arm_Pitch]= 75*DEG2RAD;
-    Angle[Id_Right_Arm_Roll] = -85*DEG2RAD ;
+    Angle[Id_Right_Arm_Roll] = -75*DEG2RAD ;
     Angle[Id_Right_Arm_Elbow]= 110*DEG2RAD;
   
     //left arm joints update  
@@ -361,7 +406,7 @@
     Speed[Id_Left_Arm_Elbow]= _Speed;
     
     Angle[Id_Left_Arm_Pitch]= 75*DEG2RAD;
-    Angle[Id_Left_Arm_Roll] = -85*DEG2RAD;
+    Angle[Id_Left_Arm_Roll] = -75*DEG2RAD;
     Angle[Id_Left_Arm_Elbow]= 110*DEG2RAD;
     
    
@@ -384,17 +429,17 @@
     Angle[Id_Right_Hip_Pitch]  =80*DEG2RAD + WEP[P_Right_Leg_Hip_Pitch_Offset];
     Angle[Id_Left_Hip_Pitch]   =80*DEG2RAD + WEP[P_Left_Leg_Hip_Pitch_Offset];  
     
-    Angle[Id_Right_Hip_Yaw]   = 0 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
-    Angle[Id_Left_Hip_Yaw]    = 0 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
+    Angle[Id_Right_Hip_Yaw]   = 30 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
+    Angle[Id_Left_Hip_Yaw]    = 30 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
     
-    Angle[Id_Right_Hip_Roll]  = 0 + WEP[P_Right_Leg_Hip_Roll_Offset];
-    Angle[Id_Left_Hip_Roll]   = 0 + WEP[P_Left_Leg_Hip_Roll_Offset];  
+    Angle[Id_Right_Hip_Roll]  = -30 + WEP[P_Right_Leg_Hip_Roll_Offset];
+    Angle[Id_Left_Hip_Roll]   = -30 + WEP[P_Left_Leg_Hip_Roll_Offset];  
       
-    Angle[Id_Right_Foot_Roll] = 0 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
-    Angle[Id_Left_Foot_Roll]  = 0 + WEP[P_Left_Leg_Foot_Roll_Offset];  
+    Angle[Id_Right_Foot_Roll] = -30 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
+    Angle[Id_Left_Foot_Roll]  = -30 + WEP[P_Left_Leg_Foot_Roll_Offset];
     
-    Angle[Id_Right_Knee]       =-90*DEG2RAD + WEP[P_Right_Leg_Knee_Offset]; 
-    Angle[Id_Left_Knee]        =-90*DEG2RAD + WEP[P_Left_Leg_Knee_Offset]; 
+    Angle[Id_Right_Knee]       =-125*DEG2RAD + WEP[P_Right_Leg_Knee_Offset]; 
+    Angle[Id_Left_Knee]        =-125*DEG2RAD + WEP[P_Left_Leg_Knee_Offset]; 
     
     Angle[Id_Right_Foot_Pitch] =85*DEG2RAD + WEP[P_Right_Leg_Foot_Pitch_Offset];
     Angle[Id_Left_Foot_Pitch]  =85*DEG2RAD + WEP[P_Left_Leg_Foot_Pitch_Offset];  
@@ -402,6 +447,8 @@
     
     }
     //444444**********************************************************************************************************
+    //for(;;){}
+    _Speed=0.4;
     for(int i=0;i<=15;i++){
       vTaskDelay(delay_x);
      //all speed are betwin 0~1
@@ -444,14 +491,14 @@
     Angle[Id_Right_Hip_Pitch]  =90*DEG2RAD + WEP[P_Right_Leg_Hip_Pitch_Offset];
     Angle[Id_Left_Hip_Pitch]   =90*DEG2RAD + WEP[P_Left_Leg_Hip_Pitch_Offset];  
     
-    Angle[Id_Right_Hip_Yaw]   = 0 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
-    Angle[Id_Left_Hip_Yaw]    = 0 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
+    Angle[Id_Right_Hip_Yaw]   = 30 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
+    Angle[Id_Left_Hip_Yaw]    = 30 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
     
-    Angle[Id_Right_Hip_Roll]  = 0 + WEP[P_Right_Leg_Hip_Roll_Offset];
-    Angle[Id_Left_Hip_Roll]   = 0 + WEP[P_Left_Leg_Hip_Roll_Offset];  
+    Angle[Id_Right_Hip_Roll]  = -30 + WEP[P_Right_Leg_Hip_Roll_Offset];
+    Angle[Id_Left_Hip_Roll]   = -30 + WEP[P_Left_Leg_Hip_Roll_Offset];  
       
-    Angle[Id_Right_Foot_Roll] = 0 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
-    Angle[Id_Left_Foot_Roll]  = 0 + WEP[P_Left_Leg_Foot_Roll_Offset];  
+    Angle[Id_Right_Foot_Roll] = -30 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
+    Angle[Id_Left_Foot_Roll]  = -30 + WEP[P_Left_Leg_Foot_Roll_Offset];
     
     Angle[Id_Right_Knee]       =-145*DEG2RAD + WEP[P_Right_Leg_Knee_Offset]; 
     Angle[Id_Left_Knee]        =-145*DEG2RAD + WEP[P_Left_Leg_Knee_Offset]; 
@@ -505,14 +552,14 @@
     Angle[Id_Right_Hip_Pitch]  =45*DEG2RAD + WEP[P_Right_Leg_Hip_Pitch_Offset];
     Angle[Id_Left_Hip_Pitch]   =45*DEG2RAD + WEP[P_Left_Leg_Hip_Pitch_Offset];  
     
-    Angle[Id_Right_Hip_Yaw]   = 0 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
-    Angle[Id_Left_Hip_Yaw]    = 0 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
+    Angle[Id_Right_Hip_Yaw]   = 30 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
+    Angle[Id_Left_Hip_Yaw]    = 30 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
     
-    Angle[Id_Right_Hip_Roll]  = 0 + WEP[P_Right_Leg_Hip_Roll_Offset];
-    Angle[Id_Left_Hip_Roll]   = 0 + WEP[P_Left_Leg_Hip_Roll_Offset];  
+    Angle[Id_Right_Hip_Roll]  = -30 + WEP[P_Right_Leg_Hip_Roll_Offset];
+    Angle[Id_Left_Hip_Roll]   = -30 + WEP[P_Left_Leg_Hip_Roll_Offset];  
       
-    Angle[Id_Right_Foot_Roll] = 0 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
-    Angle[Id_Left_Foot_Roll]  = 0 + WEP[P_Left_Leg_Foot_Roll_Offset];  
+    Angle[Id_Right_Foot_Roll] = -30 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
+    Angle[Id_Left_Foot_Roll]  = -30 + WEP[P_Left_Leg_Foot_Roll_Offset];  
     
     Angle[Id_Right_Knee]       =-145*DEG2RAD + WEP[P_Right_Leg_Knee_Offset]; 
     Angle[Id_Left_Knee]        =-145*DEG2RAD + WEP[P_Left_Leg_Knee_Offset]; 
@@ -565,14 +612,14 @@
     Angle[Id_Right_Hip_Pitch]  =50*DEG2RAD + WEP[P_Right_Leg_Hip_Pitch_Offset];
     Angle[Id_Left_Hip_Pitch]   =50*DEG2RAD + WEP[P_Left_Leg_Hip_Pitch_Offset];  
     
-    Angle[Id_Right_Hip_Yaw]   = 0 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
-    Angle[Id_Left_Hip_Yaw]    = 0 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
+    Angle[Id_Right_Hip_Yaw]   = 30 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
+    Angle[Id_Left_Hip_Yaw]    = 30 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
     
-    Angle[Id_Right_Hip_Roll]  = 0 + WEP[P_Right_Leg_Hip_Roll_Offset];
-    Angle[Id_Left_Hip_Roll]   = 0 + WEP[P_Left_Leg_Hip_Roll_Offset];  
+    Angle[Id_Right_Hip_Roll]  = 30 + WEP[P_Right_Leg_Hip_Roll_Offset];
+    Angle[Id_Left_Hip_Roll]   = 30 + WEP[P_Left_Leg_Hip_Roll_Offset];  
       
-    Angle[Id_Right_Foot_Roll] = 0 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
-    Angle[Id_Left_Foot_Roll]  = 0 + WEP[P_Left_Leg_Foot_Roll_Offset];  
+    Angle[Id_Right_Foot_Roll] = -30 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
+    Angle[Id_Left_Foot_Roll]  = -30 + WEP[P_Left_Leg_Foot_Roll_Offset];  
     
     Angle[Id_Right_Knee]       =-85*DEG2RAD + WEP[P_Right_Leg_Knee_Offset]; 
     Angle[Id_Left_Knee]        =-85*DEG2RAD + WEP[P_Left_Leg_Knee_Offset]; 
@@ -583,10 +630,11 @@
     
     }
   //***********************************************************************************************************
-  for(int cnt=0;cnt<300;cnt++)
+    Change_Pid();
+  for(int cnt=0;cnt<400;cnt++)
     {
-      Stand_Init(0.1);
-      vTaskDelay(delay_x);
+      Stand_Init(0.2);
+      vTaskDelay(delay_x*3);
     } 
   } 
   
@@ -598,9 +646,10 @@
   
   
   void Motion_Stand_Up_Front_2(){
+    Dxl.writeByte(BROADCAST_ID,P_P_Gain ,32);
     byte delay_x=60;
     double _Speed=0.1;
-    for(int i=0;i<=30;i++){
+    for(int i=0;i<=20;i++){
       vTaskDelay(delay_x);
     //all speed are betwin 0~1
     //al joint are betwin -3.14 ~ 3.14
@@ -657,11 +706,10 @@
     
     Angle[Id_Right_Foot_Pitch] =85*DEG2RAD + WEP[P_Right_Leg_Foot_Pitch_Offset];
     Angle[Id_Left_Foot_Pitch]  =85*DEG2RAD + WEP[P_Left_Leg_Foot_Pitch_Offset];  
-   
-    
+
     }
     //22222***********************************************************************************************************
-    for(int i=0;i<=30;i++){
+    for(int i=0;i<=20;i++){
       vTaskDelay(delay_x);
     //all speed are betwin 0~1
     //al joint are betwin -3.14 ~ 3.14
@@ -721,7 +769,7 @@
     
     }
     //33333***********************************************************************************************************
-    for(int i=0;i<=30;i++){
+    for(int i=0;i<=20;i++){
       vTaskDelay(delay_x);
     //all speed are betwin 0~1
     //al joint are betwin -3.14 ~ 3.14
@@ -781,7 +829,7 @@
     
     }
     //444444**********************************************************************************************************
-    for(int i=0;i<=30;i++){
+    for(int i=0;i<=20;i++){
       vTaskDelay(delay_x);
      //all speed are betwin 0~1
     //al joint are betwin -3.14 ~ 3.14
@@ -937,7 +985,7 @@
     //set left leg speeds
     Speed[Id_Left_Hip_Yaw]    = _Speed;
     Speed[Id_Left_Hip_Roll]   = _Speed;
-    Speed[Id_Left_Hip_Pitch]  = 0.30;
+    Speed[Id_Left_Hip_Pitch]  = 0.03;
     Speed[Id_Left_Knee]       = 0.01;
     Speed[Id_Left_Foot_Pitch] = 0.01;
     Speed[Id_Left_Foot_Roll]  = _Speed;
@@ -1024,15 +1072,24 @@
     
     }
     //888888***********************************************************************************************************
-  for(int cnt=0;cnt<100;cnt++)
-    {
-      Stand_Init(0.01);
-      vTaskDelay(delay_x);
-    } 
+    Change_Pid();
+    for(unsigned int i=0;i<=200;i++){
+      togglePin(BLUE_LED_485EXP);
+      Calculate_Euler_Angles();
+      vTaskDelay(2);
+    }
+
     for(int cnt=0;cnt<100;cnt++)
     {
-      Stand_Init(0.1);
-      vTaskDelay(delay_x);
+      Stand_Init(0.05);
+      vTaskDelay(delay_x*2);
+    } 
+
+
+    for(int cnt=0;cnt<200;cnt++)
+    {
+      Stand_Init(0.02);
+      vTaskDelay(delay_x*4);
     } 
   } 
    
@@ -1045,7 +1102,7 @@
   
   
   void  Motion_Stand_Up_Back_1(){
-      byte delay_x=30;
+    byte delay_x=30;
     double _Speed=0.09;
     for(int i=0;i<=20;i++){
       vTaskDelay(delay_x);
@@ -1089,14 +1146,14 @@
     Angle[Id_Right_Hip_Pitch]  =45*DEG2RAD + WEP[P_Right_Leg_Hip_Pitch_Offset];
     Angle[Id_Left_Hip_Pitch]   =45*DEG2RAD + WEP[P_Left_Leg_Hip_Pitch_Offset];  
     
-    Angle[Id_Right_Hip_Yaw]   = 0 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
-    Angle[Id_Left_Hip_Yaw]    = 0 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
+    Angle[Id_Right_Hip_Yaw]   = 20 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
+    Angle[Id_Left_Hip_Yaw]    = 20 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
     
-    Angle[Id_Right_Hip_Roll]  = 0 + WEP[P_Right_Leg_Hip_Roll_Offset];
-    Angle[Id_Left_Hip_Roll]   = 0 + WEP[P_Left_Leg_Hip_Roll_Offset];  
+    Angle[Id_Right_Hip_Roll]  = -20 + WEP[P_Right_Leg_Hip_Roll_Offset];
+    Angle[Id_Left_Hip_Roll]   = -20 + WEP[P_Left_Leg_Hip_Roll_Offset];  
       
-    Angle[Id_Right_Foot_Roll] = 0 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
-    Angle[Id_Left_Foot_Roll]  = 0 + WEP[P_Left_Leg_Foot_Roll_Offset];  
+    Angle[Id_Right_Foot_Roll] = -20 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
+    Angle[Id_Left_Foot_Roll]  = -20 + WEP[P_Left_Leg_Foot_Roll_Offset];
     
     Angle[Id_Right_Knee]       =-90*DEG2RAD + WEP[P_Right_Leg_Knee_Offset]; 
     Angle[Id_Left_Knee]        =-90*DEG2RAD + WEP[P_Left_Leg_Knee_Offset]; 
@@ -1149,14 +1206,14 @@
     Angle[Id_Right_Hip_Pitch]  =90*DEG2RAD + WEP[P_Right_Leg_Hip_Pitch_Offset];
     Angle[Id_Left_Hip_Pitch]   =90*DEG2RAD + WEP[P_Left_Leg_Hip_Pitch_Offset];  
     
-    Angle[Id_Right_Hip_Yaw]   = 0 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
-    Angle[Id_Left_Hip_Yaw]    = 0 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
+    Angle[Id_Right_Hip_Yaw]   = 20 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
+    Angle[Id_Left_Hip_Yaw]    = 20 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
     
-    Angle[Id_Right_Hip_Roll]  = 0 + WEP[P_Right_Leg_Hip_Roll_Offset];
-    Angle[Id_Left_Hip_Roll]   = 0 + WEP[P_Left_Leg_Hip_Roll_Offset];  
+    Angle[Id_Right_Hip_Roll]  = -20 + WEP[P_Right_Leg_Hip_Roll_Offset];
+    Angle[Id_Left_Hip_Roll]   = -20 + WEP[P_Left_Leg_Hip_Roll_Offset];  
       
-    Angle[Id_Right_Foot_Roll] = 0 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
-    Angle[Id_Left_Foot_Roll]  = 0 + WEP[P_Left_Leg_Foot_Roll_Offset];  
+    Angle[Id_Right_Foot_Roll] = -20 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
+    Angle[Id_Left_Foot_Roll]  = -20 + WEP[P_Left_Leg_Foot_Roll_Offset];  
     
     Angle[Id_Right_Knee]       =-90*DEG2RAD + WEP[P_Right_Leg_Knee_Offset]; 
     Angle[Id_Left_Knee]        =-90*DEG2RAD + WEP[P_Left_Leg_Knee_Offset]; 
@@ -1209,14 +1266,14 @@
     Angle[Id_Right_Hip_Pitch]  =90*DEG2RAD + WEP[P_Right_Leg_Hip_Pitch_Offset];
     Angle[Id_Left_Hip_Pitch]   =90*DEG2RAD + WEP[P_Left_Leg_Hip_Pitch_Offset];  
     
-    Angle[Id_Right_Hip_Yaw]   = 0 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
-    Angle[Id_Left_Hip_Yaw]    = 0 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
+    Angle[Id_Right_Hip_Yaw]   = 20 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
+    Angle[Id_Left_Hip_Yaw]    = 20 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
     
-    Angle[Id_Right_Hip_Roll]  = 0 + WEP[P_Right_Leg_Hip_Roll_Offset];
-    Angle[Id_Left_Hip_Roll]   = 0 + WEP[P_Left_Leg_Hip_Roll_Offset];  
+    Angle[Id_Right_Hip_Roll]  = -20 + WEP[P_Right_Leg_Hip_Roll_Offset];
+    Angle[Id_Left_Hip_Roll]   = -20 + WEP[P_Left_Leg_Hip_Roll_Offset];  
       
-    Angle[Id_Right_Foot_Roll] = 0 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
-    Angle[Id_Left_Foot_Roll]  = 0 + WEP[P_Left_Leg_Foot_Roll_Offset];  
+    Angle[Id_Right_Foot_Roll] = -20 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
+    Angle[Id_Left_Foot_Roll]  = -20 + WEP[P_Left_Leg_Foot_Roll_Offset]; 
     
     Angle[Id_Right_Knee]       =-90*DEG2RAD + WEP[P_Right_Leg_Knee_Offset]; 
     Angle[Id_Left_Knee]        =-90*DEG2RAD + WEP[P_Left_Leg_Knee_Offset]; 
@@ -1269,14 +1326,14 @@
     Angle[Id_Right_Hip_Pitch]  =90*DEG2RAD + WEP[P_Right_Leg_Hip_Pitch_Offset];
     Angle[Id_Left_Hip_Pitch]   =90*DEG2RAD + WEP[P_Left_Leg_Hip_Pitch_Offset];  
     
-    Angle[Id_Right_Hip_Yaw]   = 0 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
-    Angle[Id_Left_Hip_Yaw]    = 0 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
+    Angle[Id_Right_Hip_Yaw]   = 20 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
+    Angle[Id_Left_Hip_Yaw]    = 20 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
     
-    Angle[Id_Right_Hip_Roll]  = 0 + WEP[P_Right_Leg_Hip_Roll_Offset];
-    Angle[Id_Left_Hip_Roll]   = 0 + WEP[P_Left_Leg_Hip_Roll_Offset];  
+    Angle[Id_Right_Hip_Roll]  = -20 + WEP[P_Right_Leg_Hip_Roll_Offset];
+    Angle[Id_Left_Hip_Roll]   = -20 + WEP[P_Left_Leg_Hip_Roll_Offset];  
       
-    Angle[Id_Right_Foot_Roll] = 0 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
-    Angle[Id_Left_Foot_Roll]  = 0 + WEP[P_Left_Leg_Foot_Roll_Offset];  
+    Angle[Id_Right_Foot_Roll] = -20 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
+    Angle[Id_Left_Foot_Roll]  = -20 + WEP[P_Left_Leg_Foot_Roll_Offset];
     
     Angle[Id_Right_Knee]       =-90*DEG2RAD + WEP[P_Right_Leg_Knee_Offset]; 
     Angle[Id_Left_Knee]        =-90*DEG2RAD + WEP[P_Left_Leg_Knee_Offset]; 
@@ -1330,14 +1387,14 @@
     Angle[Id_Right_Hip_Pitch]  =35*DEG2RAD + WEP[P_Right_Leg_Hip_Pitch_Offset];
     Angle[Id_Left_Hip_Pitch]   =35*DEG2RAD + WEP[P_Left_Leg_Hip_Pitch_Offset];  
     
-    Angle[Id_Right_Hip_Yaw]   = 0 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
-    Angle[Id_Left_Hip_Yaw]    = 0 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
+    Angle[Id_Right_Hip_Yaw]   = 20 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
+    Angle[Id_Left_Hip_Yaw]    = 20 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
     
-    Angle[Id_Right_Hip_Roll]  = 0 + WEP[P_Right_Leg_Hip_Roll_Offset];
-    Angle[Id_Left_Hip_Roll]   = 0 + WEP[P_Left_Leg_Hip_Roll_Offset];  
+    Angle[Id_Right_Hip_Roll]  = -20 + WEP[P_Right_Leg_Hip_Roll_Offset];
+    Angle[Id_Left_Hip_Roll]   = -20 + WEP[P_Left_Leg_Hip_Roll_Offset];  
       
-    Angle[Id_Right_Foot_Roll] = 0 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
-    Angle[Id_Left_Foot_Roll]  = 0 + WEP[P_Left_Leg_Foot_Roll_Offset];  
+    Angle[Id_Right_Foot_Roll] = -20 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
+    Angle[Id_Left_Foot_Roll]  = -20 + WEP[P_Left_Leg_Foot_Roll_Offset];
     
     Angle[Id_Right_Knee]       =-125*DEG2RAD + WEP[P_Right_Leg_Knee_Offset]; 
     Angle[Id_Left_Knee]        =-125*DEG2RAD + WEP[P_Left_Leg_Knee_Offset]; 
@@ -1391,14 +1448,14 @@
     Angle[Id_Right_Hip_Pitch]  =-25*DEG2RAD + WEP[P_Right_Leg_Hip_Pitch_Offset];
     Angle[Id_Left_Hip_Pitch]   =-25*DEG2RAD + WEP[P_Left_Leg_Hip_Pitch_Offset];  
     
-    Angle[Id_Right_Hip_Yaw]   = 0 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
-    Angle[Id_Left_Hip_Yaw]    = 0 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
+    Angle[Id_Right_Hip_Yaw]   = 20 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
+    Angle[Id_Left_Hip_Yaw]    = 20 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
     
-    Angle[Id_Right_Hip_Roll]  = 0 + WEP[P_Right_Leg_Hip_Roll_Offset];
-    Angle[Id_Left_Hip_Roll]   = 0 + WEP[P_Left_Leg_Hip_Roll_Offset];  
+    Angle[Id_Right_Hip_Roll]  = -20 + WEP[P_Right_Leg_Hip_Roll_Offset];
+    Angle[Id_Left_Hip_Roll]   = -20 + WEP[P_Left_Leg_Hip_Roll_Offset];  
       
-    Angle[Id_Right_Foot_Roll] = 0 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
-    Angle[Id_Left_Foot_Roll]  = 0 + WEP[P_Left_Leg_Foot_Roll_Offset];  
+    Angle[Id_Right_Foot_Roll] = -20 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
+    Angle[Id_Left_Foot_Roll]  = -20 + WEP[P_Left_Leg_Foot_Roll_Offset];
     
     Angle[Id_Right_Knee]       =-125*DEG2RAD + WEP[P_Right_Leg_Knee_Offset]; 
     Angle[Id_Left_Knee]        =-125*DEG2RAD + WEP[P_Left_Leg_Knee_Offset]; 
@@ -1453,14 +1510,14 @@
     Angle[Id_Right_Hip_Pitch]  =15*DEG2RAD + WEP[P_Right_Leg_Hip_Pitch_Offset];
     Angle[Id_Left_Hip_Pitch]   =15*DEG2RAD + WEP[P_Left_Leg_Hip_Pitch_Offset];    
     
-    Angle[Id_Right_Hip_Yaw]   = 0 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
-    Angle[Id_Left_Hip_Yaw]    = 0 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
+    Angle[Id_Right_Hip_Yaw]   = 20 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
+    Angle[Id_Left_Hip_Yaw]    = 20 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
     
-    Angle[Id_Right_Hip_Roll]  = 0 + WEP[P_Right_Leg_Hip_Roll_Offset];
-    Angle[Id_Left_Hip_Roll]   = 0 + WEP[P_Left_Leg_Hip_Roll_Offset];  
+    Angle[Id_Right_Hip_Roll]  = -20 + WEP[P_Right_Leg_Hip_Roll_Offset];
+    Angle[Id_Left_Hip_Roll]   = -20 + WEP[P_Left_Leg_Hip_Roll_Offset];  
       
-    Angle[Id_Right_Foot_Roll] = 0 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
-    Angle[Id_Left_Foot_Roll]  = 0 + WEP[P_Left_Leg_Foot_Roll_Offset];  
+    Angle[Id_Right_Foot_Roll] = -20 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
+    Angle[Id_Left_Foot_Roll]  = -20 + WEP[P_Left_Leg_Foot_Roll_Offset]; 
     
     Angle[Id_Right_Knee]       =-125*DEG2RAD + WEP[P_Right_Leg_Knee_Offset]; 
     Angle[Id_Left_Knee]        =-125*DEG2RAD + WEP[P_Left_Leg_Knee_Offset]; 
@@ -1500,7 +1557,7 @@
     //set right leg speeds
     Speed[Id_Right_Hip_Yaw]    = _Speed;
     Speed[Id_Right_Hip_Roll]   = _Speed;
-    Speed[Id_Right_Hip_Pitch]  = 0.03;
+    Speed[Id_Right_Hip_Pitch]  = 0.027;
     Speed[Id_Right_Knee]       = _Speed;
     Speed[Id_Right_Foot_Pitch] = _Speed;
     Speed[Id_Right_Foot_Roll]  = _Speed;
@@ -1508,7 +1565,7 @@
     //set left leg speeds
     Speed[Id_Left_Hip_Yaw]    = _Speed;
     Speed[Id_Left_Hip_Roll]   = _Speed;
-    Speed[Id_Left_Hip_Pitch]  = 0.03;
+    Speed[Id_Left_Hip_Pitch]  = 0.027;
     Speed[Id_Left_Knee]       = _Speed;
     Speed[Id_Left_Foot_Pitch] = _Speed;
     Speed[Id_Left_Foot_Roll]  = _Speed;
@@ -1516,14 +1573,14 @@
     Angle[Id_Right_Hip_Pitch]  =15*DEG2RAD + WEP[P_Right_Leg_Hip_Pitch_Offset];
     Angle[Id_Left_Hip_Pitch]   =15*DEG2RAD + WEP[P_Left_Leg_Hip_Pitch_Offset];  
     
-    Angle[Id_Right_Hip_Yaw]   = 0 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
-    Angle[Id_Left_Hip_Yaw]    = 0 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
+    Angle[Id_Right_Hip_Yaw]   = 20 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
+    Angle[Id_Left_Hip_Yaw]    = 20 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
     
-    Angle[Id_Right_Hip_Roll]  = 0 + WEP[P_Right_Leg_Hip_Roll_Offset];
-    Angle[Id_Left_Hip_Roll]   = 0 + WEP[P_Left_Leg_Hip_Roll_Offset];  
+    Angle[Id_Right_Hip_Roll]  = -20 + WEP[P_Right_Leg_Hip_Roll_Offset];
+    Angle[Id_Left_Hip_Roll]   = -20 + WEP[P_Left_Leg_Hip_Roll_Offset];  
       
-    Angle[Id_Right_Foot_Roll] = 0 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
-    Angle[Id_Left_Foot_Roll]  = 0 + WEP[P_Left_Leg_Foot_Roll_Offset];  
+    Angle[Id_Right_Foot_Roll] = -20 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
+    Angle[Id_Left_Foot_Roll]  = -20 + WEP[P_Left_Leg_Foot_Roll_Offset]; 
     
     Angle[Id_Right_Knee]       =-125*DEG2RAD + WEP[P_Right_Leg_Knee_Offset]; 
     Angle[Id_Left_Knee]        =-125*DEG2RAD + WEP[P_Left_Leg_Knee_Offset]; 
@@ -1535,7 +1592,7 @@
     }
   //***********************************************************************************************************
   //***********************************************************************************************************
-    for(int i=0;i<=50;i++){
+   for(int i=0;i<=20;i++){
       vTaskDelay(delay_x);
     //all speed are betwin 0~1
     //al joint are betwin -3.14 ~ 3.14
@@ -1561,30 +1618,30 @@
     //set right leg speeds
     Speed[Id_Right_Hip_Yaw]    = _Speed;
     Speed[Id_Right_Hip_Roll]   = _Speed;
-    Speed[Id_Right_Hip_Pitch]  = 0.03;
+    Speed[Id_Right_Hip_Pitch]  = 0.04;
     Speed[Id_Right_Knee]       = 0.01;;
-    Speed[Id_Right_Foot_Pitch] = 0.01;
+    Speed[Id_Right_Foot_Pitch] = 0.02;
     Speed[Id_Right_Foot_Roll]  = _Speed;
   
     //set left leg speeds
     Speed[Id_Left_Hip_Yaw]    = _Speed;
     Speed[Id_Left_Hip_Roll]   = _Speed;
-    Speed[Id_Left_Hip_Pitch]  = 0.03;
+    Speed[Id_Left_Hip_Pitch]  = 0.04;
     Speed[Id_Left_Knee]       = 0.01;;
-    Speed[Id_Left_Foot_Pitch] = 0.01;
+    Speed[Id_Left_Foot_Pitch] = 0.02;
     Speed[Id_Left_Foot_Roll]  = _Speed;
   
-    Angle[Id_Right_Hip_Pitch]  =35*DEG2RAD + WEP[P_Right_Leg_Hip_Pitch_Offset];
-    Angle[Id_Left_Hip_Pitch]   =35*DEG2RAD + WEP[P_Left_Leg_Hip_Pitch_Offset];  
+    Angle[Id_Right_Hip_Pitch]  =50*DEG2RAD + WEP[P_Right_Leg_Hip_Pitch_Offset];
+    Angle[Id_Left_Hip_Pitch]   =50*DEG2RAD + WEP[P_Left_Leg_Hip_Pitch_Offset];  
     
-    Angle[Id_Right_Hip_Yaw]   = 0 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
-    Angle[Id_Left_Hip_Yaw]    = 0 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
+    Angle[Id_Right_Hip_Yaw]   = 20 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
+    Angle[Id_Left_Hip_Yaw]    = 20 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
     
-    Angle[Id_Right_Hip_Roll]  = 0 + WEP[P_Right_Leg_Hip_Roll_Offset];
-    Angle[Id_Left_Hip_Roll]   = 0 + WEP[P_Left_Leg_Hip_Roll_Offset];  
+    Angle[Id_Right_Hip_Roll]  = -20 + WEP[P_Right_Leg_Hip_Roll_Offset];
+    Angle[Id_Left_Hip_Roll]   = -20 + WEP[P_Left_Leg_Hip_Roll_Offset];  
       
-    Angle[Id_Right_Foot_Roll] = 0 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
-    Angle[Id_Left_Foot_Roll]  = 0 + WEP[P_Left_Leg_Foot_Roll_Offset];  
+    Angle[Id_Right_Foot_Roll] = -20 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
+    Angle[Id_Left_Foot_Roll]  = -20 + WEP[P_Left_Leg_Foot_Roll_Offset];
     
     Angle[Id_Right_Knee]       =-85*DEG2RAD + WEP[P_Right_Leg_Knee_Offset]; 
     Angle[Id_Left_Knee]        =-85*DEG2RAD + WEP[P_Left_Leg_Knee_Offset]; 
@@ -1595,8 +1652,9 @@
     
     }
   //***********************************************************************************************************
-    //***********************************************************************************************************
-    for(int i=0;i<=50;i++){
+      //777777***********************************************************************************************************
+
+    for(int i=0;i<=20;i++){
       vTaskDelay(delay_x);
     //all speed are betwin 0~1
     //al joint are betwin -3.14 ~ 3.14
@@ -1605,62 +1663,69 @@
     Speed[Id_Right_Arm_Roll] = _Speed;
     Speed[Id_Right_Arm_Elbow]= _Speed;
     
-    Angle[Id_Right_Arm_Pitch]= 20*DEG2RAD;
+    Angle[Id_Right_Arm_Pitch]= 5*DEG2RAD;
     Angle[Id_Right_Arm_Roll] = -85*DEG2RAD ;
-    Angle[Id_Right_Arm_Elbow]= 45*DEG2RAD;
+    Angle[Id_Right_Arm_Elbow]= 0*DEG2RAD;
   
     //left arm joints update  
     Speed[Id_Left_Arm_Pitch]= _Speed;
     Speed[Id_Left_Arm_Roll] = _Speed;
     Speed[Id_Left_Arm_Elbow]= _Speed;
     
-    Angle[Id_Left_Arm_Pitch]= 20*DEG2RAD;
+    Angle[Id_Left_Arm_Pitch]= 5*DEG2RAD;
     Angle[Id_Left_Arm_Roll] = -85*DEG2RAD;
-    Angle[Id_Left_Arm_Elbow]= 45*DEG2RAD;
+    Angle[Id_Left_Arm_Elbow]= 0*DEG2RAD;
     
    
     //set right leg speeds
     Speed[Id_Right_Hip_Yaw]    = _Speed;
     Speed[Id_Right_Hip_Roll]   = _Speed;
-    Speed[Id_Right_Hip_Pitch]  = 0.03;
+    Speed[Id_Right_Hip_Pitch]  = 0.04;
     Speed[Id_Right_Knee]       = 0.01;;
-    Speed[Id_Right_Foot_Pitch] = 0.01;
+    Speed[Id_Right_Foot_Pitch] = 0.025;
     Speed[Id_Right_Foot_Roll]  = _Speed;
   
     //set left leg speeds
     Speed[Id_Left_Hip_Yaw]    = _Speed;
     Speed[Id_Left_Hip_Roll]   = _Speed;
-    Speed[Id_Left_Hip_Pitch]  = 0.03;
+    Speed[Id_Left_Hip_Pitch]  = 0.04;
     Speed[Id_Left_Knee]       = 0.01;;
-    Speed[Id_Left_Foot_Pitch] = 0.01;
+    Speed[Id_Left_Foot_Pitch] = 0.025;
     Speed[Id_Left_Foot_Roll]  = _Speed;
   
-    Angle[Id_Right_Hip_Pitch]  =35*DEG2RAD + WEP[P_Right_Leg_Hip_Pitch_Offset];
-    Angle[Id_Left_Hip_Pitch]   =35*DEG2RAD + WEP[P_Left_Leg_Hip_Pitch_Offset];  
+    Angle[Id_Right_Hip_Pitch]  =55*DEG2RAD + WEP[P_Right_Leg_Hip_Pitch_Offset];
+    Angle[Id_Left_Hip_Pitch]   =55*DEG2RAD + WEP[P_Left_Leg_Hip_Pitch_Offset];  
     
-    Angle[Id_Right_Hip_Yaw]   = 0 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
-    Angle[Id_Left_Hip_Yaw]    = 0 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
+    Angle[Id_Right_Hip_Yaw]   = 20 + WEP[P_Right_Leg_Hip_Yaw_Offset];  
+    Angle[Id_Left_Hip_Yaw]    = 20 + WEP[P_Left_Leg_Hip_Yaw_Offset];    
     
-    Angle[Id_Right_Hip_Roll]  = 0 + WEP[P_Right_Leg_Hip_Roll_Offset];
-    Angle[Id_Left_Hip_Roll]   = 0 + WEP[P_Left_Leg_Hip_Roll_Offset];  
+    Angle[Id_Right_Hip_Roll]  = -20 + WEP[P_Right_Leg_Hip_Roll_Offset];
+    Angle[Id_Left_Hip_Roll]   = -20 + WEP[P_Left_Leg_Hip_Roll_Offset];  
       
-    Angle[Id_Right_Foot_Roll] = 0 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
-    Angle[Id_Left_Foot_Roll]  = 0 + WEP[P_Left_Leg_Foot_Roll_Offset];  
+    Angle[Id_Right_Foot_Roll] = -20 + WEP[P_Right_Leg_Foot_Roll_Offset]; 
+    Angle[Id_Left_Foot_Roll]  = -20 + WEP[P_Left_Leg_Foot_Roll_Offset];
     
-    Angle[Id_Right_Knee]       =-75*DEG2RAD + WEP[P_Right_Leg_Knee_Offset]; 
-    Angle[Id_Left_Knee]        =-75*DEG2RAD + WEP[P_Left_Leg_Knee_Offset]; 
+    Angle[Id_Right_Knee]       =-85*DEG2RAD + WEP[P_Right_Leg_Knee_Offset]; 
+    Angle[Id_Left_Knee]        =-85*DEG2RAD + WEP[P_Left_Leg_Knee_Offset]; 
     
-    Angle[Id_Right_Foot_Pitch] =35*DEG2RAD + WEP[P_Right_Leg_Foot_Pitch_Offset];
-    Angle[Id_Left_Foot_Pitch]  =35*DEG2RAD + WEP[P_Left_Leg_Foot_Pitch_Offset];   
+    Angle[Id_Right_Foot_Pitch] =50*DEG2RAD + WEP[P_Right_Leg_Foot_Pitch_Offset];
+    Angle[Id_Left_Foot_Pitch]  =50*DEG2RAD + WEP[P_Left_Leg_Foot_Pitch_Offset];   
    
     
     }
-  //***********************************************************************************************************
-  for(int cnt=0;cnt<300;cnt++)
-    {
-      Stand_Init(0.02);
-      vTaskDelay(delay_x);
+    //888888***********************************************************************************************************
+    Change_Pid();
+    for(unsigned int i=0;i<=100;i++){
+      togglePin(BLUE_LED_485EXP);
+      Calculate_Euler_Angles();
+      vTaskDelay(2);
     }
+    
+    for(int cnt=0;cnt<300;cnt++)
+    {
+      Stand_Init(0.01);
+      vTaskDelay(delay_x);
+    } 
   
   }
   
@@ -1809,6 +1874,7 @@
     
     }
     //***********************************************************************************************************
+
       for(int i=0;i<=30;i++){
       vTaskDelay(delay_x);
     //all speed are betwin 0~1
@@ -2236,6 +2302,7 @@
     
     }
     //888888***********************************************************************************************************
+    Change_Pid();
   for(int cnt=0;cnt<300;cnt++)
     {
       Stand_Init(0.01);
