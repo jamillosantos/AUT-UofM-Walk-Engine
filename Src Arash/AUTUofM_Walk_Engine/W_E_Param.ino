@@ -4,7 +4,7 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
   WEP[P_Head_Pan_Speed] =1000;
   WEP[P_Head_Tilt_Speed]=1000;
   
-  WEP[P_Min_Voltage_Limit]=130; //128 voltage minimum for loop and buzzer error
+  WEP[P_Min_Voltage_Limit]=130; //129 voltage minimum for loop and buzzer error //for Arash big battery should put 120
   
   //fall thershold
   WEP[P_Fall_Roll_Thershold] =0.65;              
@@ -19,11 +19,12 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[Vt_Offset]=0.0;
     
     //Walk Engine Parameters
-    WEP[P_Motion_Resolution]=0.12; //0.15
+    //Config this with this stably to achieve a good walk
+    WEP[P_Motion_Resolution]=0.12; //0.12
     WEP[P_Gait_Frequency]=0.1;  //0.15                    
     WEP[P_Double_Support_Sleep]=40;               
     WEP[P_Single_Support_Sleep]=0;                 
-    WEP[P_Fly_Roll_Gain]=0.005; //-0.01                       
+    WEP[P_Fly_Roll_Gain]=0.0; //0.005                       
     WEP[P_Fly_Pitch_Gain]=0.8;                     
     WEP[P_Fly_Yaw_Gain]=0;                     
     WEP[P_Fly_X_Swing_Gain]=0;                  
@@ -68,7 +69,7 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
 
     //both leg offset in inverse kinematic (body COM)
     WEP[P_COM_X_offset]=0;                       
-    WEP[P_COM_Y_offset]=10;                       
+    WEP[P_COM_Y_offset]=25; //i will increase it later for Arash                      
     WEP[P_COM_Z_offset]=80;                       
     WEP[P_COM_Roll_offset]=0;                   
     WEP[P_COM_Pitch_offset]=0;                   

@@ -29,6 +29,10 @@
 #define MPU_GY80_SCL_Pin             6
 #define MPU_GY80_SDA_Pin             5
 
+#define sendEuler 0 //when this is 0 Euler angle will not be sent. It needs to turn on to send IMU to ROS
+#define controlDirectionMode 1 //Direction Mode will be forcing robot to face one direction like goalkeeper 
+#define directionPos 1 //Positive direction?
+
 //global array for set joint angle
 double Angle[NUM_OF_DXL];
 double Speed[NUM_OF_DXL];
@@ -177,6 +181,47 @@ void vDCM_Update_Task( void *pvParameters ){
     //calculate euler angles
     Calculate_Euler_Angles();
     
+    if(controlDirectionMode){
+      //control for yaw reposition to one direction
+      double et=0;
+      double DVt_thre = 0.03;
+      double current_z=((MPU_Z * RAD2DEG)+360);
+      double et_range=2.0;
+      if(directionPos) {
+        double goal_dir = 300.0; //toward exit 11
+        
+        //et is eror theta
+        et= goal_dir - current_z;
+        
+        
+        //SerialUSB.println(et);
+        
+        if(abs(et)<=et_range) et=0.0;
+        
+        double DVt= et * 0.005 ;
+        if(DVt> DVt_thre) DVt =DVt_thre;
+        if(DVt< -DVt_thre) DVt= -DVt_thre;
+        Vt= DVt; 
+      }
+      else{
+        double goal_dir = -236.0; //toward opposite dir
+        et= goal_dir + current_z;
+        if(abs(et)<=et_range) et=0.0;
+        double DVt= et * 0.005 ;
+        if(DVt> DVt_thre) DVt =DVt_thre;
+        if(DVt< -DVt_thre) DVt= -DVt_thre;
+        Vt= DVt; 
+      }
+      
+      
+      SerialUSB.print(et); SerialUSB.print("\t ");
+      SerialUSB.print(current_z); SerialUSB.print("\t ");
+      SerialUSB.println(Vt);
+    //end of control of yaw reposition
+    }
+   
+    //SerialUSB.println(et);
+    
     //update voltage and PID
     if(DCM_Loop_Cnt==1){
       vTaskSuspendAll();
@@ -206,8 +251,10 @@ void vDCM_Update_Task( void *pvParameters ){
     //send data to the usb serial port
     if((DCM_Loop_Cnt%10)==0){ 
       digitalWrite(GREEN_LED_485EXP, LOW);
-      //Send_Euler_State();
-      SerialUSB.println(MPU_Z);
+      if(sendEuler ==1)
+        Send_Euler_State();
+      //SerialUSB.println(MPU_Z);
+      
       digitalWrite(GREEN_LED_485EXP, HIGH);
     }
     

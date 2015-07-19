@@ -4,8 +4,8 @@ void vWalk_Engine_Task( void *pvParameters ){
   vTaskSuspendAll();
   //Configure Robot Walk Engine... 
   Init_Robot_First();
-  Vx=0.0001;        //velocity of X (forward) direction from PC (min -1 to max 1)
-  Vy=0.0;        //velocity of Y (sideward) direction
+  Vx=0.0001;        //velocity of X (forward) direction from PC (min -1 to max 1) //-0,15 tested 
+  Vy=0.0;        //velocity of Y (sideward) direction (+ve robot's right) //0.5 max //0.35 optimal
   Vt=0.0;        //velocity of T (rotate) speed (per radian)  
   Buzzer(200);
   xTaskResumeAll();
@@ -24,7 +24,7 @@ void vWalk_Engine_Task( void *pvParameters ){
        //start gait
        WEP[P_Left_Leg_Y_Offset]=-50;
        WEP[P_Right_Leg_Y_Offset]=50;
-       Stand_Init_T(1.0,3);  // last one was 2
+       Stand_Init_T(0.5,5);  // last one was 2
        Set_Walk_Engine_Parameters((byte)Teen_Size_Robot_Num);
        Omni_Gait(WEP[Vx_Offset],WEP[Vy_Offset],WEP[Vt_Offset]); //execute omni-directional start gait
        
@@ -137,6 +137,7 @@ void vWalk_Engine_Task( void *pvParameters ){
 }
 
 //omni directional gaite generation
+//vx, vy, va is the offset of the velocity
 void Omni_Gait(double vx, double vy, double vt){
   double L_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
   double R_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
@@ -146,16 +147,17 @@ void Omni_Gait(double vx, double vy, double vt){
   double Joint_Speed = 0.3;
   
   //gait generate with for loop form  0~3.14
+  //Time of each gait is about Double Sleep delay + Single sleep delay + Gait freq * 100
   for(double t=0; t<=TwoPi ;t+=WEP[P_Motion_Resolution]){  //TwoPi=(3.1415*2)
    
-    if (Vx >  0.25)  Vx=  0.25;
-    if (Vx < -0.25)  Vx= -0.25;
+    if (Vx >  0.5)  Vx=  0.5; //was 0.25
+    if (Vx < -0.5)  Vx= -0.5;//was 0.25
     
     if (Vy >  0.5)  Vy=  0.5;
     if (Vy < -0.5)  Vy= -0.5;
     
-    if (Vt >  0.1)  Vt=  0.1;
-    if (Vt < -0.1)  Vt= -0.1;
+    if (Vt >  0.05)  Vt=  0.05;
+    if (Vt < -0.05)  Vt= -0.05;
      
     //-----------------------
     if ( ((t>=Pi-WEP[P_Motion_Resolution])&&(t<=Pi+WEP[P_Motion_Resolution])) || ((t>=TwoPi-WEP[P_Motion_Resolution])&&(t<=TwoPi+WEP[P_Motion_Resolution])) ){
