@@ -155,36 +155,90 @@ void vDCM_Update_Task(void *pvParameters)
 		if (DCM_Loop_Cnt >= 100) DCM_Loop_Cnt = 0;  //50
 
 		//check for data recive from USB serial
-		if (SerialUSB.available() == 9)
+		if (SerialUSB.available() > 0)
 		{
-			byte buffer[9];
-			SerialUSB.read(buffer, 9);
-			vTaskSuspendAll();
-			digitalWrite(BOARD_LED_PIN, LOW);
-			if (buffer[0] == 254)
+			byte bufferTmp;
+			SerialUSB.read(&bufferTmp, 1);
+			if (bufferTmp == 0xFF)
 			{
-				//walk data update
-				Vx = (double) ((((byte) buffer[1]) - 100) / 100.0);
-				Vy = (double) ((((byte) buffer[2]) - 100) / 100.0);
-				Vt = (double) ((((byte) buffer[3]) - 100) / 100.0);
-
-				Motion_Ins = (Internal_Motion_Request == No_Motion) ? buffer[4] : No_Motion;
-
-				if (Internal_Motion_Request == No_Motion)
+				if (SerialUSB.available() > 0)
 				{
-					//head data update
-					unsigned long T = 0;
-					T = ((unsigned long) ((unsigned long) (buffer[6] << 8) + ((byte) buffer[5])));
-					double Pan_Angle = (T <= 32767) ? (double) (T / 1000.0) : (double) (-((T - 32767) / 1000.0));
+					SerialUSB.read(&bufferTmp, 1);
+					if (bufferTmp == 0x01)
+					{
+						if (SerialUSB.available() == 8)
+						{
+							byte buffer[8];
+							SerialUSB.read(buffer, 8);
+							vTaskSuspendAll();
+							digitalWrite(BOARD_LED_PIN, LOW);
+							//walk data update
+							Vx = (double) ((((byte) buffer[0]) - 100) / 100.0);
+							Vy = (double) ((((byte) buffer[1]) - 100) / 100.0);
+							Vt = (double) ((((byte) buffer[2]) - 100) / 100.0);
 
-					T = ((unsigned long) ((unsigned long) (buffer[8] << 8) + ((byte) buffer[7])));
-					double Tilt_Angle = (T <= 32767) ? (double) (T / 1000.0) : (double) (-((T - 32767) / 1000.0));
+							Motion_Ins = (Internal_Motion_Request == No_Motion) ? buffer[3] : No_Motion;
 
-					Set_Head(Pan_Angle, Tilt_Angle, WEP[P_Head_Pan_Speed], WEP[P_Head_Tilt_Speed]);
+							if (Internal_Motion_Request == No_Motion)
+							{
+								//head data update
+								unsigned long T = 0;
+								T = ((unsigned long) ((unsigned long) (buffer[5] << 8) + ((byte) buffer[4])));
+								double Pan_Angle = (T <= 32767) ? (double) (T / 1000.0) : (double) (-((T - 32767) /
+																									  1000.0));
+
+								T = ((unsigned long) ((unsigned long) (buffer[7] << 8) + ((byte) buffer[6])));
+								double Tilt_Angle = (T <= 32767) ? (double) (T / 1000.0) : (double) (-((T - 32767) /
+																									   1000.0));
+
+								Set_Head(Pan_Angle, Tilt_Angle, WEP[P_Head_Pan_Speed], WEP[P_Head_Tilt_Speed]);
+							}
+							digitalWrite(BOARD_LED_PIN, HIGH);
+							xTaskResumeAll();
+						}
+					}
+					else if (bufferTmp == 0x02)
+					{
+						if (SerialUSB.available() == 3)
+						{
+							byte buffer[3];
+							SerialUSB.read(buffer, 3);
+							vTaskSuspendAll();
+							digitalWrite(BOARD_LED_PIN, LOW);
+
+							unsigned long T = 0;
+							T = ((unsigned long) ((unsigned long) (buffer[5] << 8) + ((byte) buffer[4])));
+							double Pan_Angle = (T <= 32767) ? (double) (T / 1000.0) : (double) (-((T - 32767) /
+																								  1000.0));
+
+							T = ((unsigned long) ((unsigned long) (buffer[7] << 8) + ((byte) buffer[6])));
+							double Tilt_Angle = (T <= 32767) ? (double) (T / 1000.0) : (double) (-((T - 32767) /
+																								   1000.0));
+
+							Set_Head(Pan_Angle, Tilt_Angle, WEP[P_Head_Pan_Speed], WEP[P_Head_Tilt_Speed]);
+
+							digitalWrite(BOARD_LED_PIN, HIGH);
+							xTaskResumeAll();
+						}
+					}
+					else if (bufferTmp == 0x03)
+					{
+						if (SerialUSB.available() == 4)
+						{
+							byte buffer[3];
+							SerialUSB.read(buffer, 4);
+							vTaskSuspendAll();
+							digitalWrite(BOARD_LED_PIN, LOW);
+							//walk data update
+							Vx = (double) ((((byte) buffer[0]) - 100) / 100.0);
+							Vy = (double) ((((byte) buffer[1]) - 100) / 100.0);
+							Vt = (double) ((((byte) buffer[2]) - 100) / 100.0);
+							digitalWrite(BOARD_LED_PIN, HIGH);
+							xTaskResumeAll();
+						}
+					}
 				}
 			}
-			digitalWrite(BOARD_LED_PIN, HIGH);
-			xTaskResumeAll();
 		}
 
 		//calculate euler angles
