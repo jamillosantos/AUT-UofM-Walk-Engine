@@ -4,8 +4,8 @@
 #include "MapleFreeRTOS.h"   // RTOS Lib
 
 // Ten Size Akbar=0  Asghar=1
-//#define Teen_Size_Robot_Num   (0)  //Arash
-#define Teen_Size_Robot_Num     (1) //smaller one
+#define Teen_Size_Robot_Num   (0)  //AUT Akbar
+//#define Teen_Size_Robot_Num     (1) //AS
 
 //motion numbers table
 #define Motion_1                     0x01

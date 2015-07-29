@@ -54,7 +54,7 @@ void Update_Ik(double _R_Leg_Speed, double _L_Leg_Speed, double _R_Leg_Ik[], dou
   Speed[Id_Right_Arm_Elbow]= _R_Arm[I_A_Ve];
   Angle[Id_Right_Arm_Pitch]= _R_Arm[I_A_Pitch] + WEP[P_R_Arm_Pitch_offset] + (MPU_X * WEP[P_Stablizer_Arm_Pitch_Gain]) + ((Gyro_X * Gyro_X * Gyro_X) * WEP[P_Gyro_Stablizer_Arm_Pitch_Gain]);
   Angle[Id_Right_Arm_Roll] = _R_Arm[I_A_Roll]  + WEP[P_R_Arm_Roll_offset]  + (MPU_Y * WEP[P_Stablizer_Arm_Roll_Gain]); 
-  if (Angle[Id_Right_Arm_Roll]<-1.9) Angle[Id_Right_Arm_Roll]=-1.9;
+  if (Angle[Id_Right_Arm_Roll]<-1.85) Angle[Id_Right_Arm_Roll]=-1.85;
   Angle[Id_Right_Arm_Elbow]= _R_Arm[I_A_Elbow] + WEP[P_R_Arm_Elbow_offset];
 
   //left arm joints update  
@@ -63,7 +63,7 @@ void Update_Ik(double _R_Leg_Speed, double _L_Leg_Speed, double _R_Leg_Ik[], dou
   Speed[Id_Left_Arm_Elbow]= _L_Arm[I_A_Ve];
   Angle[Id_Left_Arm_Pitch]= _L_Arm[I_A_Pitch] + WEP[P_L_Arm_Pitch_offset] + (MPU_X * WEP[P_Stablizer_Arm_Pitch_Gain]) + ((Gyro_X * Gyro_X * Gyro_X) * WEP[P_Gyro_Stablizer_Arm_Pitch_Gain]);
   Angle[Id_Left_Arm_Roll] = _L_Arm[I_A_Roll]  + WEP[P_L_Arm_Roll_offset]  - (MPU_Y * WEP[P_Stablizer_Arm_Roll_Gain]);
-  if (Angle[Id_Left_Arm_Roll]<-1.9) Angle[Id_Left_Arm_Roll]=-1.9;
+  if (Angle[Id_Left_Arm_Roll]<-1.85) Angle[Id_Left_Arm_Roll]=-1.85;
   Angle[Id_Left_Arm_Elbow]= _L_Arm[I_A_Elbow] + WEP[P_L_Arm_Elbow_offset];
 
   //set right leg speeds

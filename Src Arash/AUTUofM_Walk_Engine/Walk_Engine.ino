@@ -4,8 +4,8 @@ void vWalk_Engine_Task( void *pvParameters ){
   vTaskSuspendAll();
   //Configure Robot Walk Engine... 
   Init_Robot_First();
-  Vx=0.0001;        //velocity of X (forward) direction from PC (min -1 to max 1) //-0,15 tested 
-  Vy=0.0;        //velocity of Y (sideward) direction (+ve robot's right) //0.5 max //0.35 optimal
+  Vx=0.0;        //velocity of X (forward) direction from PC (min -1 to max 1)
+  Vy=0.0;        //velocity of Y (sideward) direction
   Vt=0.0;        //velocity of T (rotate) speed (per radian)  
   Buzzer(200);
   xTaskResumeAll();
@@ -21,10 +21,11 @@ void vWalk_Engine_Task( void *pvParameters ){
     togglePin(RED_LED_485EXP);
     
     if ((((Vx!=0) ||(Vy!=0)||(Vt!=0)) && (Motion_Ins==No_Motion) && (Internal_Motion_Request==No_Motion )) && (System_Voltage>=(int)WEP[P_Min_Voltage_Limit])) {
+       Stand_Init_T(0.5,50); 
        //start gait
        WEP[P_Left_Leg_Y_Offset]=-50;
        WEP[P_Right_Leg_Y_Offset]=50;
-       Stand_Init_T(0.5,5);  // last one was 2
+       Stand_Init_T(1.0,4);  // last one was 2
        Set_Walk_Engine_Parameters((byte)Teen_Size_Robot_Num);
        Omni_Gait(WEP[Vx_Offset],WEP[Vy_Offset],WEP[Vt_Offset]); //execute omni-directional start gait
        
@@ -57,11 +58,11 @@ void vWalk_Engine_Task( void *pvParameters ){
                  vTaskDelay(1000);
                  Check_Robot_Fall=0;                
                  Actuators_Update=1;
-                 Stand_Init_T(1.0, 50);
+                 Stand_Init_T(1.0, 10);
                  //Internal_Motion_Request=No_Motion;
                  Motion_Stand_Up_Front((byte)Teen_Size_Robot_Num);
                  Internal_Motion_Request=No_Motion;     
-                 Stand_Init_T(1.0, 50);
+                 Stand_Init_T(1.0, 10);
                  Check_Robot_Fall=1;
             }
                  break;
@@ -70,11 +71,11 @@ void vWalk_Engine_Task( void *pvParameters ){
                  vTaskDelay(1000);
                  Check_Robot_Fall=0;
                  Actuators_Update=1;
-                 Stand_Init_T(1.0, 50);
+                 Stand_Init_T(1.0, 10);
                  //Internal_Motion_Request=No_Motion;
                  Motion_Stand_Up_Back((byte)Teen_Size_Robot_Num);
                  Internal_Motion_Request=No_Motion;
-                 Stand_Init_T(1.0, 50); 
+                 Stand_Init_T(1.0, 10); 
                  Check_Robot_Fall=1;  
             }           
                  break;
@@ -84,17 +85,20 @@ void vWalk_Engine_Task( void *pvParameters ){
       switch(Motion_Ins){  //check for instrcation
             case (byte)Motion_1:{
                  //run motion 1
-                 Stand_Init_T(1.0, 20);
+                   //initialize head joint 
+                  Set_Head(0,0.5,500,500);
+                 Stand_Init_T(1.0, 25);
                  Run_R_Kik_Motion((byte)Teen_Size_Robot_Num);
-                 Stand_Init_T(1.0, 20);
+                 Stand_Init_T(1.0, 70);
                  Motion_Ins=No_Motion;
                  }
                  break;
             case (byte)Motion_2:
                  //run motion 2
-                 Stand_Init_T(1.0, 20);
+                  Set_Head(0,0.5,500,500);
+                 Stand_Init_T(1.0, 25);
                  Run_L_Kik_Motion((byte)Teen_Size_Robot_Num);
-                 Stand_Init_T(1.0, 20);
+                 Stand_Init_T(1.0, 70);
                  Motion_Ins=No_Motion;
                  break;
             case (byte)Motion_3:
@@ -137,7 +141,6 @@ void vWalk_Engine_Task( void *pvParameters ){
 }
 
 //omni directional gaite generation
-//vx, vy, va is the offset of the velocity
 void Omni_Gait(double vx, double vy, double vt){
   double L_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
   double R_Leg_Ik[6];  // x, y, z, roll, pitch, yaw
@@ -147,20 +150,19 @@ void Omni_Gait(double vx, double vy, double vt){
   double Joint_Speed = 0.3;
   
   //gait generate with for loop form  0~3.14
-  //Time of each gait is about Double Sleep delay + Single sleep delay + Gait freq * 100
-  for(double t=0; t<=TwoPi ;t+=WEP[P_Motion_Resolution]){  //TwoPi=(3.1415*2)
+  for(double t=0; t<=TwoPi ;t+=WEP[P_Motion_Resolution]){ 
    
-    if (Vx >  0.5)  Vx=  0.5; //was 0.25
-    if (Vx < -0.5)  Vx= -0.5;//was 0.25
+    if (vx >  0.3)  vx=  0.3;
+    if (vx < -0.3)  vx= -0.3;
     
-    if (Vy >  0.5)  Vy=  0.5;
-    if (Vy < -0.5)  Vy= -0.5;
+    if (vy >  0.4)  vy=  0.4;
+    if (vy < -0.4)  vy= -0.4;
     
-    if (Vt >  0.05)  Vt=  0.05;
-    if (Vt < -0.05)  Vt= -0.05;
+    if (vt >  0.05)  vt=  0.05;
+    if (vt < -0.05)  vt= -0.05;
      
     //-----------------------
-    if ( ((t>=Pi-WEP[P_Motion_Resolution])&&(t<=Pi+WEP[P_Motion_Resolution])) || ((t>=TwoPi-WEP[P_Motion_Resolution])&&(t<=TwoPi+WEP[P_Motion_Resolution])) ){
+    if ( ((t>=Pi-WEP[P_Motion_Resolution])&&(t<=Pi+WEP[P_Motion_Resolution])) || ((t>=TwoPi-WEP[P_Motion_Resolution])&&(t<=TwoPi+WEP[P_Motion_Resolution])) || (t==0.0) ){
         vTaskDelay(WEP[P_Double_Support_Sleep]);    
     }
         
@@ -170,7 +172,10 @@ void Omni_Gait(double vx, double vy, double vt){
     
     //right leg initialize
     //if t<pi the right leg in fly state and other wise in support state
-    R_Leg_Ik[I_X]     = (-(cos(t)*(vx*100.0)))+ (vx * WEP[P_Body_X_Swing_Gain] * 100.0); 
+    int S_X=1;
+    if(vx<0.0) S_X=0.2;
+    
+    R_Leg_Ik[I_X]     = (-(cos(t)*(vx*100.0)))+ (vx * WEP[P_Body_X_Swing_Gain] * S_X * 100.0); 
     R_Leg_Ik[I_Y]     = (t<=Pi) ? (sin(t)*(WEP[P_Body_Y_Swing_Gain]*100.0)) + (sin(t)*(WEP[P_Fly_Y_Swing_Gain]*100.0)) + (cos(t-Pi)*(vy*50.0)) 
                         : (sin(t)*(WEP[P_Body_Y_Swing_Gain]*100.0))+(cos(t-Pi)*(vy*50.0))+(sin(t)*WEP[P_Support_Y_Swing_Gain]);
     R_Leg_Ik[I_Z]     = (t<=Pi) ? (sin(t)*(WEP[P_Fly_Z_Swing_Gain]*100.0)) : (sin(t)*(WEP[P_Support_Z_Swing_Gain]*100.0));
@@ -179,7 +184,7 @@ void Omni_Gait(double vx, double vy, double vt){
     R_Leg_Ik[I_Yaw]   = (cos(t-Pi)*(vt)); //(cos(t-Pi)*(vt));
   
     //left leh initialize
-    L_Leg_Ik[I_X]     = (-(cos(t-Pi)*(vx*100.0)))+ (vx * WEP[P_Body_X_Swing_Gain] * 100.0);
+    L_Leg_Ik[I_X]     = (-(cos(t-Pi)*(vx*100.0)))+ (vx * WEP[P_Body_X_Swing_Gain] * S_X * 100.0);
     L_Leg_Ik[I_Y]     = (t>=Pi) ? (-sin(t)*(WEP[P_Body_Y_Swing_Gain]*100.0)) + (-sin(t)*(WEP[P_Fly_Y_Swing_Gain]*100.0)) +(cos(t-Pi)*(vy*50.0)) 
                         : (-sin(t)*(WEP[P_Body_Y_Swing_Gain]*100.0))+(cos(t-Pi)*(vy*50.0))+(sin(t)*WEP[P_Support_Y_Swing_Gain]);
     L_Leg_Ik[I_Z]     = (t>=Pi) ? ((sin(t-Pi))*(WEP[P_Fly_Z_Swing_Gain]*100.0)) : ((sin(t-Pi))*(WEP[P_Support_Z_Swing_Gain]*100.0));
@@ -188,7 +193,7 @@ void Omni_Gait(double vx, double vy, double vt){
     L_Leg_Ik[I_Yaw]   = (cos(t-Pi)*(vt)); //(cos(t-Pi)*(vt));
     
     //right arm initialize
-    R_Arm[I_A_Pitch]   = ((cos(t)) * vx * 1.3); // + Arm_Hopping_Val; // + ((MPU_X+Get_E_Param(Addr_IMU_X_Angle_Offset)) * Get_E_Param(Addr_Stablizer_Arm_Pitch_Gain)*2);
+    R_Arm[I_A_Pitch]   = ((cos(t)) * vx * 1.995); // + Arm_Hopping_Val; // + ((MPU_X+Get_E_Param(Addr_IMU_X_Angle_Offset)) * Get_E_Param(Addr_Stablizer_Arm_Pitch_Gain)*2);
     R_Arm[I_A_Roll]    = 0.0;
     R_Arm[I_A_Elbow]   = 0.0;
     R_Arm[I_A_Vp]      = 0.2;
@@ -196,7 +201,7 @@ void Omni_Gait(double vx, double vy, double vt){
     R_Arm[I_A_Ve]      = 0.05;
   
     //left arm initialize
-    L_Arm[I_A_Pitch]   = ((cos(t-Pi)) * vx * 1.3); // + Arm_Hopping_Val;// + ((MPU_X+Get_E_Param(Addr_IMU_X_Angle_Offset)) * Get_E_Param(Addr_Stablizer_Arm_Pitch_Gain)*2); 
+    L_Arm[I_A_Pitch]   = ((cos(t-Pi)) * vx * 1.995); // + Arm_Hopping_Val;// + ((MPU_X+Get_E_Param(Addr_IMU_X_Angle_Offset)) * Get_E_Param(Addr_Stablizer_Arm_Pitch_Gain)*2); 
     L_Arm[I_A_Roll]    = 0.0;
     L_Arm[I_A_Elbow]   = 0.0;
     L_Arm[I_A_Vp]      = 0.2;
@@ -238,14 +243,27 @@ void Robot_State(){
            Check_Robot_Fall=0;
            
            vTaskSuspendAll();
+           
            Dxl.writeByte(BROADCAST_ID,P_TORQUE_ENABLE,0);
            Dxl.writeByte(Id_Head_Pan,P_TORQUE_ENABLE,1);
            Dxl.writeByte(Id_Head_Tilt,P_TORQUE_ENABLE,1);
+           
+           Set_Head(0,-0.4,1023,1023);
+           Dxl.setPosition(Id_Head_Pan,2048+(((int)((Head_Pan_Angle*RAD2DEG)*DEG2DXL))*1),(int)Head_Pan_Speed);
+           Dxl.setPosition(Id_Head_Tilt,2048+(((int)(((Head_Tilt_Angle-MPU_X)*RAD2DEG)*DEG2DXL))*1),(int)Head_Tilt_Speed);
+  
+           Dxl.writeByte(Id_Right_Hip_Yaw,P_TORQUE_ENABLE,1);
+           Dxl.writeByte(Id_Left_Hip_Yaw,P_TORQUE_ENABLE,1);
+      
+           Dxl.writeByte(Id_Right_Hip_Roll,P_TORQUE_ENABLE,1);
+           Dxl.writeByte(Id_Left_Hip_Roll,P_TORQUE_ENABLE,1);
+           
            xTaskResumeAll();
             
            Internal_Motion_Request=Stand_Up_Front;
            //Buzzer(200);
            vTaskDelay(1500);
+           Check_Robot_Fall=1;
            }
            break;
       case (byte)Fallen_Back:{
@@ -256,10 +274,22 @@ void Robot_State(){
            Dxl.writeByte(BROADCAST_ID,P_TORQUE_ENABLE,0);
            Dxl.writeByte(Id_Head_Pan,P_TORQUE_ENABLE,1);
            Dxl.writeByte(Id_Head_Tilt,P_TORQUE_ENABLE,1);
+           
+           Set_Head(0,0.4,1023,1023);
+           Dxl.setPosition(Id_Head_Pan,2048+(((int)((Head_Pan_Angle*RAD2DEG)*DEG2DXL))*1),(int)Head_Pan_Speed);
+           Dxl.setPosition(Id_Head_Tilt,2048+(((int)(((Head_Tilt_Angle-MPU_X)*RAD2DEG)*DEG2DXL))*1),(int)Head_Tilt_Speed);
+           
+           Dxl.writeByte(Id_Right_Hip_Yaw,P_TORQUE_ENABLE,1);
+           Dxl.writeByte(Id_Left_Hip_Yaw,P_TORQUE_ENABLE,1);
+      
+           Dxl.writeByte(Id_Right_Hip_Roll,P_TORQUE_ENABLE,1);
+           Dxl.writeByte(Id_Left_Hip_Roll,P_TORQUE_ENABLE,1);
+           
            xTaskResumeAll();
             
            Internal_Motion_Request=Stand_Up_Back;
            vTaskDelay(1500);
+           Check_Robot_Fall=1;
             //Buzzer(200);
            }
            break;
@@ -270,11 +300,22 @@ void Robot_State(){
            Dxl.writeByte(BROADCAST_ID,P_TORQUE_ENABLE,0);
            Dxl.writeByte(Id_Head_Pan,P_TORQUE_ENABLE,1);
            Dxl.writeByte(Id_Head_Tilt,P_TORQUE_ENABLE,1);
+           
+           Set_Head(0,-0.4,1023,1023);
+           Dxl.setPosition(Id_Head_Pan,2048+(((int)((Head_Pan_Angle*RAD2DEG)*DEG2DXL))*1),(int)Head_Pan_Speed);
+           Dxl.setPosition(Id_Head_Tilt,2048+(((int)(((Head_Tilt_Angle-MPU_X)*RAD2DEG)*DEG2DXL))*1),(int)Head_Tilt_Speed);
+           
+           Dxl.writeByte(Id_Right_Hip_Yaw,P_TORQUE_ENABLE,1);
+           Dxl.writeByte(Id_Left_Hip_Yaw,P_TORQUE_ENABLE,1);
+      
+           Dxl.writeByte(Id_Right_Hip_Roll,P_TORQUE_ENABLE,1);
+           Dxl.writeByte(Id_Left_Hip_Roll,P_TORQUE_ENABLE,1);
            xTaskResumeAll();
             
            Internal_Motion_Request=Stand_Up_Front;
            //Buzzer(200);
            vTaskDelay(1500);
+           Check_Robot_Fall=1;
            }
            break; 
       case (byte)Fallen_Left:{
@@ -284,11 +325,22 @@ void Robot_State(){
            Dxl.writeByte(BROADCAST_ID,P_TORQUE_ENABLE,0);
            Dxl.writeByte(Id_Head_Pan,P_TORQUE_ENABLE,1);
            Dxl.writeByte(Id_Head_Tilt,P_TORQUE_ENABLE,1);
+           
+           Set_Head(0,0.4,1023,1023);
+           Dxl.setPosition(Id_Head_Pan,2048+(((int)((Head_Pan_Angle*RAD2DEG)*DEG2DXL))*1),(int)Head_Pan_Speed);
+           Dxl.setPosition(Id_Head_Tilt,2048+(((int)(((Head_Tilt_Angle-MPU_X)*RAD2DEG)*DEG2DXL))*1),(int)Head_Tilt_Speed);
+           
+           Dxl.writeByte(Id_Right_Hip_Yaw,P_TORQUE_ENABLE,1);
+           Dxl.writeByte(Id_Left_Hip_Yaw,P_TORQUE_ENABLE,1);
+      
+           Dxl.writeByte(Id_Right_Hip_Roll,P_TORQUE_ENABLE,1);
+           Dxl.writeByte(Id_Left_Hip_Roll,P_TORQUE_ENABLE,1);
            xTaskResumeAll();
             
            Internal_Motion_Request=Stand_Up_Front;
            //Buzzer(200);
            vTaskDelay(1500);
+           Check_Robot_Fall=1;
            }
            break;  
       case (byte)Normal_Stand:
