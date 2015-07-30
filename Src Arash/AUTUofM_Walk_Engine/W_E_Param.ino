@@ -4,7 +4,7 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
   WEP[P_Head_Pan_Speed] =1000;
   WEP[P_Head_Tilt_Speed]=1000;
   
-  WEP[P_Min_Voltage_Limit]=125; //128 voltage minimum for loop and buzzer error
+  WEP[P_Min_Voltage_Limit]=110; //128 voltage minimum for loop and buzzer error
   
   //fall thershold
   WEP[P_Fall_Roll_Thershold] =0.4;              
