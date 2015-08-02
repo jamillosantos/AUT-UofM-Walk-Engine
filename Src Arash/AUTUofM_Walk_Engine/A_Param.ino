@@ -127,3 +127,8 @@
 #define Vy_Offset                             95
 #define Vt_Offset                             96
 
+#define P_Left_Leg_Hip_Pitch_Offset_Original      97 //add
+#define P_Right_Leg_Hip_Pitch_Offset_Original     98 //add
+#define P_Left_Leg_Hip_Pitch_Offset_Backwards     99 //add
+#define P_Right_Leg_Hip_Pitch_Offset_Backwards    100 //add
+

@@ -4,7 +4,7 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
   WEP[P_Head_Pan_Speed] =1000;
   WEP[P_Head_Tilt_Speed]=1000;
   
-  WEP[P_Min_Voltage_Limit]=110; //128 voltage minimum for loop and buzzer error
+  WEP[P_Min_Voltage_Limit]=100; //128 voltage minimum for loop and buzzer error
   
   //fall thershold
   WEP[P_Fall_Roll_Thershold] =0.4;              
@@ -14,9 +14,9 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
   if (Robot_Num==0){
     WEP[P_Leg_Length]=471.0;
     
-    WEP[Vx_Offset]=-0.02;
+    WEP[Vx_Offset]=-0.07;
     WEP[Vy_Offset]=0.0;
-    WEP[Vt_Offset]=0.0; //-0.006
+    WEP[Vt_Offset]=0.001; //-0.006
     
     //Walk Engine Parameters
     WEP[P_Motion_Resolution]=0.130; //0.12
@@ -75,16 +75,22 @@ void Set_Walk_Engine_Parameters(byte Robot_Num){
     WEP[P_COM_Yaw_offset]=0;                   
  
     //legs joints offset 
+    
+    WEP[P_Left_Leg_Hip_Pitch_Offset_Original]=0.1;
+    WEP[P_Right_Leg_Hip_Pitch_Offset_Original]=0.1;
+    WEP[P_Left_Leg_Hip_Pitch_Offset_Backwards]=0.0;
+    WEP[P_Right_Leg_Hip_Pitch_Offset_Backwards]=0.0;
+
     WEP[P_Left_Leg_Hip_Yaw_Offset]=0.0;           
     WEP[P_Left_Leg_Hip_Roll_Offset]=0;          
-    WEP[P_Left_Leg_Hip_Pitch_Offset]=0.1;          
+    WEP[P_Left_Leg_Hip_Pitch_Offset]=WEP[P_Left_Leg_Hip_Pitch_Offset_Original];
     WEP[P_Left_Leg_Knee_Offset]=0;              
     WEP[P_Left_Leg_Foot_Pitch_Offset]=0;         
     WEP[P_Left_Leg_Foot_Roll_Offset]=0;           
 
     WEP[P_Right_Leg_Hip_Yaw_Offset]=0.0;          
     WEP[P_Right_Leg_Hip_Roll_Offset]=0;          
-    WEP[P_Right_Leg_Hip_Pitch_Offset]=0.1;         
+    WEP[P_Right_Leg_Hip_Pitch_Offset]=WEP[P_Right_Leg_Hip_Pitch_Offset_Original];         
     WEP[P_Right_Leg_Knee_Offset]=0;             
     WEP[P_Right_Leg_Foot_Pitch_Offset]=0;        
     WEP[P_Right_Leg_Foot_Roll_Offset]=0;         

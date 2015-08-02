@@ -175,6 +175,19 @@ void Omni_Gait(double vx, double vy, double vt){
     int S_X=1;
     if(vx<0.0) S_X=0.2;
     
+    if (vx > 0)
+    {
+      WEP[P_Left_Leg_Hip_Pitch_Offset]=WEP[P_Left_Leg_Hip_Pitch_Offset_Original];
+      WEP[P_Right_Leg_Hip_Pitch_Offset]=WEP[P_Right_Leg_Hip_Pitch_Offset_Original];
+    }
+    else if (vx < 0)
+    {
+      WEP[P_Left_Leg_Hip_Pitch_Offset]=WEP[P_Left_Leg_Hip_Pitch_Offset_Backwards];
+      WEP[P_Right_Leg_Hip_Pitch_Offset]=WEP[P_Right_Leg_Hip_Pitch_Offset_Backwards];
+    }
+    
+    
+    
     R_Leg_Ik[I_X]     = (-(cos(t)*(vx*100.0)))+ (vx * WEP[P_Body_X_Swing_Gain] * S_X * 100.0); 
     R_Leg_Ik[I_Y]     = (t<=Pi) ? (sin(t)*(WEP[P_Body_Y_Swing_Gain]*100.0)) + (sin(t)*(WEP[P_Fly_Y_Swing_Gain]*100.0)) + (cos(t-Pi)*(vy*50.0)) 
                         : (sin(t)*(WEP[P_Body_Y_Swing_Gain]*100.0))+(cos(t-Pi)*(vy*50.0))+(sin(t)*WEP[P_Support_Y_Swing_Gain]);

@@ -44,7 +44,7 @@ double Gyro_X=0, Gyro_Y=0;
 double System_Voltage=160; //defult voltage
 byte   Actuators_Update=1;
 byte   Actuators_Update_PID=1;
-double WEP[100];
+double WEP[110];
 
 //walk engine parameters (these are sent from PC)
 //main walk parameters
